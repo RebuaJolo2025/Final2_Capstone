@@ -1,28 +1,35 @@
 <?php
+session_start();
 include 'conn.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Check if required fields are submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $product_id = mysqli_real_escape_string($conn, $_POST['product_id']);
-    $quantity = (int) $_POST['quantity'];
+    $price = mysqli_real_escape_string($conn, $_POST['price']);
+    $fullName = mysqli_real_escape_string($conn, $_POST['fullName']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $notes = mysqli_real_escape_string($conn, $_POST['notes']);
+    $quantity = (int)$_POST['quantity'];
 
-    // Optional: Validate product again
-    $result = mysqli_query($conn, "SELECT * FROM shop WHERE product_id = $product_id");
-    if (mysqli_num_rows($result) > 0) {
-        $product = mysqli_fetch_assoc($result);
-        $total = $product['price'] * $quantity;
+    $total_price = $price * $quantity;
+    $order_date = date("Y-m-d H:i:s");
 
-        // Store order (assumes you have `orders` table)
-        // You can insert into an orders table here...
+    // Insert into orders table
+    $insert = "INSERT INTO orders (product_id, full_name, phone, address, notes, quantity, total_price, order_date)
+               VALUES ('$product_id', '$fullName', '$phone', '$address', '$notes', '$quantity', '$total_price', '$order_date')";
 
-        echo "<h1>Thank you for your order!</h1>";
-        echo "<p>You ordered <strong>{$quantity}</strong> of <strong>{$product['name']}</strong>.</p>";
-        echo "<p>Total Amount: <strong>Php {$total}</strong></p>";
+    if (mysqli_query($conn, $insert)) {
+        echo "<h2>Order Placed Successfully!</h2>";
+        echo "<p>Thank you, $fullName. Your order has been placed.</p>";
+        echo "<p>Total: Php " . number_format($total_price, 2) . "</p>";
+        echo "<a href='index.php'>Return to Shop</a>";
     } else {
-        echo "Invalid product.";
+        echo "Error placing order: " . mysqli_error($conn);
     }
+
+    mysqli_close($conn);
 } else {
-    echo "Invalid request.";
+    echo "<p>Invalid request method.</p>";
 }
-
-
 ?>
