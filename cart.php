@@ -1,158 +1,101 @@
+<?php
+session_start();
+include 'conn.php';
+
+// Redirect if not logged in
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$email = $_SESSION['email'];
+$query = "SELECT * FROM cart WHERE email = '$email'";
+$result = mysqli_query($conn, $query);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart</title>
-    <link rel="stylesheet" href="style/style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
             padding: 20px;
         }
-
         .cart-container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
+            margin: auto;
+            background: #fff;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
-        .cart-header {
+        h1 {
+            color: #333;
             text-align: center;
-            margin-bottom: 30px;
         }
-
-        .cart-header h1 {
-            font-size: 2.5em;
-            color: #2E7D32;
-        }
-
-        .cart-items {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px 0;
-        }
-
         .cart-item {
             display: flex;
+            gap: 15px;
             align-items: center;
-            gap: 20px;
-            background-color: #fdfdfd;
+            margin: 15px 0;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: #fafafa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
         .cart-item img {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
             object-fit: cover;
-            border-radius: 8px;
         }
-
         .cart-item-details {
             flex-grow: 1;
         }
-
-        .cart-item h3 {
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
-
-        .cart-item p {
-            color: #555;
-            font-size: 1.1em;
-        }
-
-        .cart-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        .empty-cart-message {
-            text-align: center;
-            font-size: 1.5em;
-            color: #999;
-            margin-top: 30px;
-        }
-
         .checkout-btn {
             display: block;
-            width: 200px;
-            margin: 30px auto;
+            width: 100%;
+            background: #28a745;
+            color: #fff;
             padding: 15px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 1.2em;
+            font-size: 18px;
             text-align: center;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            margin-top: 20px;
         }
-
         .checkout-btn:hover {
-            background-color: #45a049;
+            background: #218838;
         }
     </style>
 </head>
 <body>
 
 <div class="cart-container">
-    <div class="cart-header">
-        <h1>Your Shopping Cart</h1>
-    </div>
+    <h1>Your Shopping Cart</h1>
 
-    <?php 
-    session_start();
-    include 'conn.php';
-
-    if (!isset($_SESSION['email'])) {
-        echo "<script>
-                alert('You must be logged in to add items to the cart');
-                window.location.href = 'login.php';
-            </script>";
-    }
-
-    $email = $_SESSION['email'];
-
-    $query = "SELECT * FROM cart WHERE email = '$email'";
-    $result = mysqli_query($conn, $query);
-
-    if (mysqli_num_rows($result) > 0) {
-        echo '<form action="checkout.php" method="POST">';
-        echo '<div class="cart-items">';
-        while($row = mysqli_fetch_assoc($result)){
-            echo '<div class="cart-item">';
-            echo '<input type="checkbox" name="selected_items[]" value="' . $row["id"] . '">';
-            echo '<img src="' . $row["image"] . '" alt="' . $row["product_name"] . '">';
-            echo '<div class="cart-item-details">';
-            echo '<h3>' . $row["product_name"] . '</h3>';
-            echo '<p>₱' . $row["product_price"] . '</p>';
-            echo '</div>';
-            echo '</div>';
-        }
-        echo '</div>';
-        echo '<button type="submit" class="checkout-btn">Proceed to Checkout</button>';
-        echo '</form>';
-    } else {
-        echo "<p class='empty-cart-message'>Your cart is empty.</p>";
-    }
-    ?>
+    <?php if (mysqli_num_rows($result) > 0): ?>
+    <form action="checkout.php" method="POST">
+        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <div class="cart-item">
+                <input type="checkbox" name="selected_items[]" value="<?= $row['id'] ?>">
+                <img src="<?= $row['image'] ?>" alt="<?= $row['product_name'] ?>">
+                <div class="cart-item-details">
+                    <h3><?= $row['product_name'] ?></h3>
+                    <p>₱<?= number_format($row['product_price'], 2) ?></p>
+                </div>
+            </div>
+        <?php endwhile; ?>
+        <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+    </form>
+    <?php else: ?>
+        <p>Your cart is empty.</p>
+    <?php endif; ?>
 </div>
 
 </body>
