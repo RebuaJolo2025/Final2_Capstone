@@ -5,13 +5,15 @@ if (!isset($_SESSION['email'])) {
     exit;
 }
 
+// Ensure buy_now session exists
 if (!isset($_SESSION['buy_now'])) {
-    echo "No product selected.";
+    echo "<p>No product selected for Buy Now. <a href='index.php'>Back to products</a></p>";
     exit;
 }
 
+// Get Buy Now item
 $item = $_SESSION['buy_now'];
-$total = $item['subtotal'];
+$total = $item['price'] * $item['quantity'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -25,6 +27,8 @@ $total = $item['subtotal'];
         .total { font-size: 18px; font-weight: bold; text-align: right; margin-top: 10px; }
         button { background: #2e7d32; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 15px; }
         button:hover { background: #256428; }
+        .back-link { display: block; margin-top: 15px; text-align: center; color: #2196F3; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -33,16 +37,19 @@ $total = $item['subtotal'];
     
     <div class="item">
         <span><?= htmlspecialchars($item['name']) ?> x <?= $item['quantity'] ?></span>
-        <span>₱<?= number_format($item['subtotal'], 2) ?></span>
+        <span>₱<?= number_format($total, 2) ?></span>
     </div>
     
     <p class="total">Total: ₱<?= number_format($total, 2) ?></p>
 
     <form method="POST" action="place_order.php">
-        <input type="hidden" name="buy_now_id" value="<?= $item['id'] ?>">
-        <input type="hidden" name="buy_now_qty" value="<?= $item['quantity'] ?>">
+        <!-- Send as if it were a cart of one -->
+        <input type="hidden" name="selected_items[]" value="<?= $item['id'] ?>">
+        <input type="hidden" name="quantities[<?= $item['id'] ?>]" value="<?= $item['quantity'] ?>">
         <button type="submit">Place Order</button>
     </form>
+
+    <a href="product-detail.php?product_id=<?= $item['id'] ?>" class="back-link">← Back to Product</a>
 </div>
 </body>
 </html>
