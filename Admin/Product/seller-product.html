@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="seller-product-styles.css">
+    <title>Seller Studio Pro - Add New Product</title>
+    <meta name="description" content="Professional e-commerce product management for sellers">
+    
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="back-btn" onclick="goBack()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="m12 20-8-8 8-8 1.425 1.4-5.6 5.6H20v2H7.825l5.6 5.6L12 20Z"/>
+                    </svg>
+                </button>
+                <div class="header-title">
+                    <h1>Add New Product</h1>
+                    <span class="status-badge">Draft</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="previewProduct()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5Z"/>
+                    </svg>
+                    Preview
+                </button>
+                <button class="btn btn-primary" onclick="saveProduct()" id="saveBtn">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
+                    </svg>
+                    Save Product
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <form id="productForm" class="form-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Basic Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg class="icon-lg" viewBox="0 0 24 24">
+                                <path d="M12,2A3,3 0 0,1 15,5V7H20A1,1 0 0,1 21,8V19A1,1 0 0,1 20,20H4A1,1 0 0,1 3,19V8A1,1 0 0,1 4,7H9V5A3,3 0 0,1 12,2M12,4A1,1 0 0,0 11,5V7H13V5A1,1 0 0,0 12,4Z"/>
+                            </svg>
+                            Basic Information
+                        </h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label" for="productName">Product Name <span class="required">*</span></label>
+                            <input type="text" id="productName" class="form-control" placeholder="Enter product name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="description">Description</label>
+                            <textarea id="description" class="form-control" rows="4" placeholder="Describe your product..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="category">Category <span class="required">*</span></label>
+                            <select id="category" class="form-control" required>
+                                <option value="">Select category</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="fashion">Fashion & Accessories</option>
+                                <option value="home">Home & Garden</option>
+                                <option value="sports">Sports & Outdoors</option>
+                                <option value="beauty">Health & Beauty</option>
+                                <option value="toys">Toys & Games</option>
+                                <option value="books">Books & Media</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="food">Food & Beverages</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing & Inventory -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg class="icon-lg" viewBox="0 0 24 24">
+                                <path d="M7,15H9C9,16.08 10.37,17 12,17C13.63,17 15,16.08 15,15C15,13.9 13.96,13.5 11.76,12.97C9.64,12.44 7,11.78 7,9C7,7.21 8.47,5.69 10.5,5.18V3H13.5V5.18C15.53,5.69 17,7.21 17,9H15C15,7.92 13.63,7 12,7C10.37,7 9,7.92 9,9C9,10.1 10.04,10.5 12.24,11.03C14.36,11.56 17,12.22 17,15C17,16.79 15.53,18.31 13.5,18.82V21H10.5V18.82C8.47,18.31 7,16.79 7,15Z"/>
+                            </svg>
+                            Pricing & Inventory
+                        </h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label class="form-label" for="price">Price <span class="required">*</span></label>
+                                <input type="number" id="price" class="form-control" step="0.01" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="comparePrice">Compare at Price</label>
+                                <input type="number" id="comparePrice" class="form-control" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row cols-2">
+                            <div class="form-group">
+                                <label class="form-label" for="stock">Stock Quantity <span class="required">*</span></label>
+                                <input type="number" id="stock" class="form-control" placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="sku">SKU</label>
+                                <input type="text" id="sku" class="form-control" placeholder="AUTO-GENERATED">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg class="icon-lg" viewBox="0 0 24 24">
+                                <path d="M3,4A2,2 0 0,0 1,6V17H3A3,3 0 0,0 6,20A3,3 0 0,0 9,17H15A3,3 0 0,0 18,20A3,3 0 0,0 21,17H23V12L20,8H17V4M10,6L14,10L10,14V11H4V9H10M17,9.5H19.5L21.47,12H17M6,15.5A1.5,1.5 0 0,1 7.5,17A1.5,1.5 0 0,1 6,18.5A1.5,1.5 0 0,1 4.5,17A1.5,1.5 0 0,1 6,15.5M18,15.5A1.5,1.5 0 0,1 19.5,17A1.5,1.5 0 0,1 18,18.5A1.5,1.5 0 0,1 16.5,17A1.5,1.5 0 0,1 18,15.5Z"/>
+                            </svg>
+                            Shipping Information
+                        </h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label" for="weight">Weight (kg)</label>
+                            <input type="number" id="weight" class="form-control" step="0.01" placeholder="0.00">
+                        </div>
+                        
+                        <div class="form-row cols-3">
+                            <div class="form-group">
+                                <label for="length">Length (cm)</label>
+                                <input type="number" id="length" class="form-control" placeholder="Length">
+                            </div>
+                            <div class="form-group">
+                                <label for="width">Width (cm)</label>
+                                <input type="number" id="width" class="form-control" placeholder="Width">
+                            </div>
+                            <div class="form-group">
+                                <label for="height">Height (cm)</label>
+                                <input type="number" id="height" class="form-control" placeholder="Height">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Product Images -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Product Images</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="image-grid" id="imageGrid">
+                            <!-- Images will be populated here -->
+                        </div>
+                        
+                        <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
+                            <input type="file" id="imageUpload" multiple accept="image/*">
+                            <div class="upload-icon">📷</div>
+                            <p><strong>Click to upload images</strong></p>
+                            <p style="font-size: 0.75rem; color: var(--text-muted);">PNG, JPG up to 10MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Tags -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg class="icon-lg" viewBox="0 0 24 24">
+                                <path d="M5.5,7A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58C12.05,2.22 11.55,2 11,2H4C2.89,2 2,2.89 2,4V11C2,11.55 2.22,12.05 2.59,12.41L11.58,21.41C11.95,21.78 12.45,22 13,22C13.55,22 14.05,21.78 14.41,21.41L21.41,14.41C21.78,14.05 22,13.55 22,13C22,12.45 21.78,11.95 21.41,11.58Z"/>
+                            </svg>
+                            Product Tags
+                        </h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="tag-input-container">
+                            <input type="text" id="tagInput" class="form-control tag-input" placeholder="Add tag">
+                            <button type="button" class="btn btn-primary btn-icon" onclick="addTag()">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="tags-container" id="tagsContainer">
+                            <!-- Tags will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;">
+                        Save Product
+                    </button>
+                    <button type="button" class="btn btn-outline" style="width: 100%;" onclick="saveDraft()">
+                        Save as Draft
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Global variables
+        let productImages = [];
+        let productTags = [];
+        let isLoading = false;
+
+        // Load draft on page load
+        window.addEventListener('load', () => {
+            // Clear any saved draft so form starts fresh
+            localStorage.removeItem('productDraft');
+
+            // Reset all inputs
+            document.getElementById('productForm').reset();
+            productImages = [];
+            productTags = [];
+            renderImages();
+            renderTags();
+
+            console.log('Form cleared on page load');
+        });
+
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            renderImages();
+            renderTags();
+        });
+
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('productForm').addEventListener('submit', handleFormSubmit);
+            
+            // Image upload
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            
+            // Tag input enter key
+            document.getElementById('tagInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addTag();
+                }
+            });
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            saveProduct();
+        }
+
+        function handleImageUpload(e) {
+            const files = Array.from(e.target.files);
+            
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        productImages.push({
+                            url: e.target.result,
+                            name: file.name,
+                            file: file
+                        });
+                        renderImages();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            showToast(`${files.length} image(s) uploaded successfully!`);
+            e.target.value = ''; // Clear input
+        }
+
+        function renderImages() {
+            const imageGrid = document.getElementById('imageGrid');
+            imageGrid.innerHTML = '';
+
+            productImages.forEach((image, index) => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                imageItem.innerHTML = `
+                    <img src="${image.url}" alt="${image.name}">
+                    <button type="button" class="image-remove" onclick="removeImage(${index})">
+                        ×
+                    </button>
+                `;
+                imageGrid.appendChild(imageItem);
+            });
+        }
+
+        function removeImage(index) {
+            productImages.splice(index, 1);
+            renderImages();
+            showToast('Image removed');
+        }
+
+        function addTag() {
+            const tagInput = document.getElementById('tagInput');
+            const tagValue = tagInput.value.trim();
+            
+            if (tagValue && !productTags.includes(tagValue)) {
+                productTags.push(tagValue);
+                tagInput.value = '';
+                renderTags();
+                showToast('Tag added');
+            }
+        }
+
+        function renderTags() {
+            const tagsContainer = document.getElementById('tagsContainer');
+            tagsContainer.innerHTML = '';
+
+            productTags.forEach((tag, index) => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.innerHTML = `
+                    ${tag}
+                    <button type="button" class="tag-remove" onclick="removeTag(${index})">
+                        ×
+                    </button>
+                `;
+                tagsContainer.appendChild(tagElement);
+            });
+        }
+
+        function removeTag(index) {
+            productTags.splice(index, 1);
+            renderTags();
+            showToast('Tag removed');
+        }
+
+        function collectFormData() {
+            return {
+                name: document.getElementById('productName').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                price: parseFloat(document.getElementById('price').value) || 0,
+                comparePrice: parseFloat(document.getElementById('comparePrice').value) || 0,
+                stock: parseInt(document.getElementById('stock').value) || 0,
+                sku: document.getElementById('sku').value || generateSKU(),
+                weight: parseFloat(document.getElementById('weight').value) || 0,
+                dimensions: {
+                    length: parseFloat(document.getElementById('length').value) || 0,
+                    width: parseFloat(document.getElementById('width').value) || 0,
+                    height: parseFloat(document.getElementById('height').value) || 0
+                },
+                images: productImages,
+                tags: productTags,
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+        }
+
+        function generateSKU() {
+            return 'SKU-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+        }
+
+        function validateForm(data) {
+            const errors = [];
+            
+            if (!data.name.trim()) {
+                errors.push('Product name is required');
+            }
+            
+            if (!data.category) {
+                errors.push('Category is required');
+            }
+            
+            if (data.price <= 0) {
+                errors.push('Price must be greater than 0');
+            }
+            
+            if (data.stock < 0) {
+                errors.push('Stock cannot be negative');
+            }
+            
+            return errors;
+        }
+
+        async function saveProduct() {
+            if (isLoading) return;
+            setLoading(true);
+
+            try {
+                const formData = collectFormData();
+                const errors = validateForm(formData);
+
+               if (errors.length > 0) {
+                    console.error('Validation errors:', errors); // <-- log to console
+                    showToast('Please fix the following errors: ' + errors.join(', '), 'error');
+                    setLoading(false);
+                    return;
+                }
+
+
+                // Prepare FormData for PHP
+                const data = new FormData();
+                data.append('name', formData.name);
+                data.append('description', formData.description);
+                data.append('category', formData.category);
+                data.append('price', formData.price);
+                data.append('comparePrice', formData.comparePrice);
+                data.append('stock', formData.stock);
+                data.append('sku', formData.sku);
+                data.append('weight', formData.weight);
+                data.append('length', formData.dimensions.length);
+                data.append('width', formData.dimensions.width);
+                data.append('height', formData.dimensions.height);
+                data.append('status', formData.status);
+                data.append('tags', JSON.stringify(formData.tags));
+
+                // Append images
+                formData.images.forEach((img) => {
+                    data.append('images[]', img.file); // img.file is the File object
+                });
+
+                // Send AJAX request to PHP
+                const response = await fetch('save_product.php', {
+                    method: 'POST',
+                    body: data
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    resetForm(); // Optional: reset the form after successful save
+                } else {
+                    showToast(result.message, 'error');
+                }
+
+            } catch (error) {
+                console.error('Validation errors:', error);
+                showToast('Error saving product: ' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+
+        async function saveDraft() {
+            if (isLoading) return;
+            setLoading(true);
+
+            try {
+                const formData = collectFormData();
+                formData.status = 'draft';
+
+                const data = new FormData();
+                data.append('name', formData.name);
+                data.append('description', formData.description);
+                data.append('category', formData.category);
+                data.append('price', formData.price);
+                data.append('comparePrice', formData.comparePrice);
+                data.append('stock', formData.stock);
+                data.append('sku', formData.sku);
+                data.append('weight', formData.weight);
+                data.append('length', formData.dimensions.length);
+                data.append('width', formData.dimensions.width);
+                data.append('height', formData.dimensions.height);
+                data.append('status', formData.status);
+                data.append('tags', JSON.stringify(formData.tags));
+
+                // Append images
+                formData.images.forEach((img) => {
+                    data.append('images[]', img.file);
+                });
+
+                const response = await fetch('save_product.php', {
+                    method: 'POST',
+                    body: data
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message, 'error');
+                }
+
+            } catch (error) {
+                showToast('Error saving draft: ' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+
+        function simulateAPISave(data) {
+            return new Promise((resolve, reject) => {
+                // Simulate network delay
+                setTimeout(() => {
+                    // Simulate random success/failure for demo
+                    if (Math.random() > 0.1) {
+                        console.log('Product data would be saved:', data);
+                        resolve(data);
+                    } else {
+                        reject(new Error('Network error'));
+                    }
+                }, 1500);
+            });
+        }
+
+        function setLoading(loading) {
+            isLoading = loading;
+            const saveBtn = document.getElementById('saveBtn');
+            const form = document.getElementById('productForm');
+            
+            if (loading) {
+                saveBtn.textContent = 'Saving...';
+                saveBtn.disabled = true;
+                form.classList.add('loading');
+            } else {
+                saveBtn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
+                    </svg>
+                    Save Product
+                `;
+                saveBtn.disabled = false;
+                form.classList.remove('loading');
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            productImages = [];
+            productTags = [];
+            renderImages();
+            renderTags();
+            showToast('Form reset');
+        }
+
+        function previewProduct() {
+            const formData = collectFormData();
+            console.log('Preview product:', formData);
+            showToast('Preview functionality would open product preview');
+        }
+
+        function goBack() {
+            if (confirm('Are you sure you want to go back? Unsaved changes will be lost.')) {
+                window.location.href = "product.html";
+
+            }
+        }
+
+        // Auto-generate SKU when product name changes
+        document.getElementById('productName').addEventListener('input', function() {
+            const skuField = document.getElementById('sku');
+
+            // Only generate SKU if the field is empty
+            if (!skuField.value) {
+                const productName = this.value.trim();
+                if (productName) {
+                    const sku = productName.toUpperCase()
+                        .replace(/[^A-Z0-9]/g, '-')     // Only letters and numbers, replace others with -
+                        .replace(/-+/g, '-')             // Remove multiple consecutive dashes
+                        .substring(0, 20) + '-' +        // Limit first part to 20 chars
+                        Math.random().toString(36).substr(2, 4).toUpperCase(); // Random 4-char suffix
+
+                    skuField.value = sku; // <-- set value instead of placeholder
+                }
+            }
+        });
+
+
+        // Auto-save draft every 30 seconds
+        setInterval(() => {
+            const formData = collectFormData();
+            if (formData.name.trim() || formData.description.trim()) {
+                localStorage.setItem('productDraft', JSON.stringify(formData));
+                console.log('Auto-saved draft to localStorage');
+            }
+        }, 30000);
+
+        // Load draft on page load
+        window.addEventListener('load', () => {
+            const draft = localStorage.getItem('productDraft');
+            if (draft) {
+                const draftData = JSON.parse(draft);
+                // Populate form with draft data
+                document.getElementById('productName').value = draftData.name || '';
+                document.getElementById('description').value = draftData.description || '';
+                document.getElementById('category').value = draftData.category || '';
+                document.getElementById('price').value = draftData.price || '';
+                document.getElementById('comparePrice').value = draftData.comparePrice || '';
+                document.getElementById('stock').value = draftData.stock || '';
+                document.getElementById('sku').value = draftData.sku || '';
+                document.getElementById('weight').value = draftData.weight || '';
+                document.getElementById('length').value = draftData.dimensions?.length || '';
+                document.getElementById('width').value = draftData.dimensions?.width || '';
+                document.getElementById('height').value = draftData.dimensions?.height || '';
+                
+                if (draftData.tags) {
+                    productTags = draftData.tags;
+                    renderTags();
+                }
+                
+                console.log('Loaded draft from localStorage');
+            }
+        });
+    </script>
+</body>
+</html>

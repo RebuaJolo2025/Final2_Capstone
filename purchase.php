@@ -17,6 +17,7 @@
         <?php
         include 'conn.php';
 
+        // Validate if the product_id exists and is numeric
         if (!isset($_GET['product_id']) || !is_numeric($_GET['product_id'])) {
             echo "<p>Invalid product ID.</p>";
             exit;

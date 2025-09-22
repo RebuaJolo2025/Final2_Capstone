@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTW Analytics Hub - Admin Dashboard</title>
+    <meta name="description" content="Comprehensive admin dashboard for Ready-to-Wear fashion analytics, sales tracking, and business insights">
+    <meta name="author" content="RTW Fashion">
+    
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Dashboard Layout -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Logo/Brand -->
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon">
+                        <i data-lucide="bar-chart-3"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h2>RTW Admin</h2>
+                        <p>Dashboard</p>
+                    </div>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Analytics</h3>
+                    <ul class="nav-list">
+                        <li><a href="#dashboard" class="nav-link active" data-page="dashboard">
+                            <i data-lucide="home"></i><span>Dashboard</span>
+                        </a></li>
+                        <li><a href="#revenue" class="nav-link" data-page="revenue">
+                            <i data-lucide="trending-up"></i><span>Revenue Analytics</span>
+                        </a></li>
+                        <li><a href="#sales" class="nav-link" data-page="sales">
+                            <i data-lucide="bar-chart-3"></i><span>Sales Analytics</span>
+                        </a></li>
+                        <li>
+                            <a href="/Caps/Admin/Product/product.html" class="nav-link">
+                                <i data-lucide="package"></i><span>Products</span>
+                            </a>
+                            </li>
+
+                        <li><a href="#payments" class="nav-link" data-page="payments">
+                            <i data-lucide="credit-card"></i><span>Payments</span>
+                        </a></li>
+                        <li><a href="#transactions" class="nav-link" data-page="transactions">
+                            <i data-lucide="shopping-bag"></i><span>Transactions</span>
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-section-title">Management</h3>
+                    <ul class="nav-list">
+                        <li><a href="#profiles" class="nav-link" data-page="profiles">
+                            <i data-lucide="users"></i><span>Profile Reports</span>
+                        </a></li>
+                        <li><a href="#refunds" class="nav-link" data-page="refunds">
+                            <i data-lucide="refresh-cw"></i><span>Refunds</span>
+                        </a></li>
+                        <li><a href="#delivery" class="nav-link" data-page="delivery">
+                            <i data-lucide="truck"></i><span>Delivery Status</span>
+                        </a></li>
+                        <li><a href="#settings" class="nav-link" data-page="settings">
+                            <i data-lucide="settings"></i><span>Settings</span>
+                        </a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="search-container">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Search products, orders, customers..." class="search-input">
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <button class="header-btn notification-btn">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    
+                    <div class="user-menu">
+                        <button class="user-avatar" id="userMenuToggle">
+                            <span>AD</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="user-info">
+                                <p class="user-name">Admin User</p>
+                                <p class="user-email">admin@rtw-fashion.com</p>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#profile" class="dropdown-item">Profile</a>
+                            <a href="#settings" class="dropdown-item">Settings</a>
+                            <a href="#support" class="dropdown-item">Support</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#logout" class="dropdown-item">Log out</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="page-header">
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome back! Here's what's happening with your RTW store today.</p>
+                    </div>
+
+                    <!-- Key Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Total Revenue</span>
+                                <i data-lucide="dollar-sign" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">$124,592</div>
+                                <div class="metric-change positive">+12.5% from last month</div>
+                                <div class="metric-description">Monthly revenue growth</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Total Orders</span>
+                                <i data-lucide="shopping-cart" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">1,429</div>
+                                <div class="metric-change positive">+8.2% from last month</div>
+                                <div class="metric-description">Orders this month</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Active Customers</span>
+                                <i data-lucide="users" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">892</div>
+                                <div class="metric-change positive">+3.7% from last month</div>
+                                <div class="metric-description">Registered customers</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Products Sold</span>
+                                <i data-lucide="package" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">3,247</div>
+                                <div class="metric-change negative">-2.1% from last month</div>
+                                <div class="metric-description">Items sold this month</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Revenue Trend</h3>
+                                <p>Monthly revenue and profit analysis</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Sales by Category</h3>
+                                <p>Product category performance</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Average Order Value</span>
+                                <i data-lucide="trending-up" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">$87.23</div>
+                                <div class="metric-change positive">+5.4% from last month</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Conversion Rate</span>
+                                <i data-lucide="credit-card" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">3.2%</div>
+                                <div class="metric-change positive">+0.8% from last month</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Pending Refunds</span>
+                                <i data-lucide="alert-triangle" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">23</div>
+                                <div class="metric-change neutral">5 new today</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Processing Time</span>
+                                <i data-lucide="clock" class="metric-icon"></i>
+                            </div>
+                            <div class="metric-content">
+                                <div class="metric-value">2.4 days</div>
+                                <div class="metric-change positive">-0.3 days faster</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Tables -->
+                    <div class="tables-grid">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3>Top Selling Products</h3>
+                            </div>
+                            <div class="table-content" id="topProductsTable">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3>Recent Transactions</h3>
+                            </div>
+                            <div class="table-content" id="recentTransactionsTable">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add more pages as needed -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="chart-data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

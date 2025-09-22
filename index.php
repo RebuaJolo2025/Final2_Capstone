@@ -12,22 +12,12 @@
             var input = document.getElementById("searchBar").value.toLowerCase();
             var productItems = document.getElementsByClassName("product-item");
 
-            // Loop through each product and check if it matches the search input
             for (var i = 0; i < productItems.length; i++) {
                 var productName = productItems[i].getElementsByTagName("h3")[0].innerText.toLowerCase();
-                
-                // Check if the product name includes the search input
-                if (productName.includes(input)) {
-                    productItems[i].style.display = ""; // Show the product if it matches
-                } else {
-                    productItems[i].style.display = "none"; // Hide the product if it doesn't match
-                }
+                productItems[i].style.display = productName.includes(input) ? "" : "none";
             }
         }
     </script>
-    <style>
-   
-    </style>
 </head>
 <body>
     <header>
@@ -54,36 +44,41 @@
     </section>
 
     <section class="product-container">
-        <?php
-        // Include database connection
-        include 'conn.php';
-        
-        // Fetch all products from database
-        $sql = "SELECT * FROM shop";
-        $result = mysqli_query($conn, $sql);
-        
-        // Check if products exist
-        if (mysqli_num_rows($result) > 0) {
-            // Loop through each product
-            while($row = mysqli_fetch_assoc($result)) {
-                echo '<div class="product-item">';
-                echo '<img src="' . $row["image"] . '" alt="' . $row["name"] . '">';
-                echo '<h3>' . $row["name"] . '</h3>';
-                echo '<p>' . '₱' . $row["price"] . '</p>';
-                echo '<a href="product-detail.php?product_id=' . $row["product_id"] . '" class="buy-now">View Details</a>';
-                echo '</div>';
+    <?php
+    include 'conn.php';
+
+    $sql = "SELECT * FROM products ORDER BY id DESC";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        while($row = mysqli_fetch_assoc($result)) {
+            $images = json_decode($row['images'], true);
+
+            // fallback image
+            $mainImage = 'Admin/Product/uploads/products/placeholder.jpg';
+
+            if (is_array($images) && count($images) > 0 && isset($images[0]['url'])) {
+                $mainImage = 'Admin/Product/' . $images[0]['url'];
+                // results in Admin/Product/uploads/products/img_68d0cd34d4a55.jpg
             }
-        } else {
-            echo "No products found";
+
+            echo '<div class="product-item">';
+            echo '<img src="' . htmlspecialchars($mainImage) . '" alt="' . htmlspecialchars($row["name"]) . '">';
+            echo '<h3>' . htmlspecialchars($row["name"]) . '</h3>';
+            echo '<p>₱' . number_format($row["price"], 2) . '</p>';
+            echo '<a href="product-detail.php?product_id=' . htmlspecialchars($row["id"]) . '" class="buy-now">View Details</a>';
+            echo '</div>';
         }
-        
-        // Close connection
-        mysqli_close($conn);
-        ?>
+
+
+    } else {
+        echo "<p>No products found.</p>";
+    }
+
+    mysqli_close($conn);
+    ?>
     </section>
-    
-    <footer>
-    </footer>
+
+   
 </body>
 </html>
-

@@ -3,6 +3,7 @@
     include 'conn.php';
 
 
+    // Register
     // Insert data to the db
     if (isset($_POST['submit'])) {
         $fn = $_POST['fullName'];
@@ -50,7 +51,6 @@
     }
 
     // Insert product info the database
-
     // Check if the user is logged in
     if (!isset($_SESSION['email'])) {
         echo "<script>

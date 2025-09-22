@@ -3,302 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cool Registration Form</title>
+    <title>Register - InfluenceX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
         body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             background: linear-gradient(135deg, #4CAF50, #2196F3);
-            transition: 0.5s;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; padding: 20px;
         }
 
-        .container {
-            display: flex;
-            width: 90%;
-            max-width: 800px;
-            height: 600px; /* Set a fixed height */
+        .register-container {
+            background: rgba(255,255,255,0.15);
+            padding: 40px 35px;
             border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: 0.5s;
-        }
-
-        .image-section {
-            flex: 1;
-            background: url('/api/placeholder/600/800') no-repeat center center/cover;
-            height: 100%;
-        }
-
-        .form-section {
-            flex: 1;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            height: 100%;
-            overflow-y: auto; /* Add scroll if content exceeds height */
-        }
-
-        h1 {
-            color: #00E676;
-            margin-top: -50px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            width: 100%; max-width: 450px;
             text-align: center;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.25);
         }
 
-        .form-group {
-            margin-bottom: 12px;
+        .register-container h1 {
+            color:#fff;
+            margin-bottom:25px;
+            font-weight:600;
         }
 
-        label {
-            color: #ccc;
-            font-size: 0.9em;
-            margin-bottom: 3px;
-            display: block;
-        }
+        .logo {font-size:2.5em;margin-bottom:10px;color:#fff;}
 
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 3px;
-            border: none;
+        .form-group {margin-bottom: 18px;text-align:left;}
+        .form-group label {
+            display: block; margin-bottom: 6px; font-size:0.9em; color:#fff;
+        }
+        .form-group input {
+            width: 100%; padding: 12px;
+            font-size: 1em; border: none;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        input:focus {
-            background: rgba(255, 255, 255, 0.2);
             outline: none;
-            box-shadow: 0 0 10px #00E676;
+            background: rgba(255,255,255,0.85);
+            transition: 0.3s;
+        }
+        .form-group input:focus {
+            border: 2px solid #2196F3;
+            background: #fff;
         }
 
         .btn {
-            width: 100%;
-            padding: 10px;
-            background: linear-gradient(90deg, #00E676, #00C864);
-            color: #1b1b32;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s ease-in-out;
-            font-size: 1.1em;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .btn:hover {
-            background: linear-gradient(90deg, #00C864, #00E676);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px #00E676;
-        }
-
-        /* Styling for the dropdown */
-        .select-group {
-            margin-bottom: 12px;
-            text-align: left;
-        }
-
-        .select-group label {
-            display: block;
-            font-size: 0.9em;
-            color: #ccc;
-            margin-bottom: 3px;
-        }
-
-        .select-group select {
-            width: 100%;
-            padding: 8px;
-            font-size: 1em;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            box-sizing: border-box;
-            transition: 0.3s ease;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .select-group select:focus {
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            box-shadow: 0 0 10px #00E676;
-        }
-
-        .select-group select option {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-        }
-
-        /* Light Mode */
-        .light-mode {
-            background: linear-gradient(135deg, #ffffff, #d9e6f3);
-        }
-
-        .light-mode .container {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(5px);
-        }
-
-        .light-mode input,
-        .light-mode select {
-            color: black;
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .light-mode .form-section {
-            background-color: rgba(255, 255, 255, 0.7);
-        }
-
-        .light-mode label {
-            color: #333;
-        }
-
-        .light-mode h1 {
-            color: #2196F3;
-        }
-
-        .light-mode .btn {
-            color: white;
+            width: 100%; padding: 12px;
             background: linear-gradient(90deg, #2196F3, #4CAF50);
-        }
-
-        .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            border-radius: 8px;
-            background: #fff;
-            color: black;
+            color: white; font-size: 1.1em;
+            border: none; border-radius: 8px;
+            cursor: pointer; font-weight:600;
             transition: 0.3s;
         }
-
-        .toggle-btn:hover {
-            background: #ddd;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
         }
 
-        /* Sign In Button */
         .sign-in-btn {
-            text-align: center;
-            margin-top: 10px;
+            margin-top:15px;font-size:0.9em;color:#fff;text-align:center;
         }
-
         .sign-in-btn a {
-            color: #00E676;
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
+            color:#FFD700;font-weight:bold;text-decoration:none;
         }
-
-        .sign-in-btn a:hover {
-            color: #00C864;
-            text-decoration: underline;
-        }
-
-        /* Light mode adjustments for the sign-in link */
-        .light-mode .sign-in-btn a {
-            color: #2196F3;
-        }
-
-        .light-mode .sign-in-btn a:hover {
-            color: #4CAF50;
-        }
+        .sign-in-btn a:hover {text-decoration:underline;}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="image-section"></div>
-        <div class="form-section">
-            <h1>Register</h1>
-            <form action="process.php" method="post">
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" name="fullName" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" name="address" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
+    <div class="register-container">
+        <div class="logo"><i class="fa-solid fa-user-plus"></i></div>
+        <h1>Register</h1>
+        <form action="process.php" method="post">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" name="submit" class="btn">Register</button>
 
-                <div class="select-group">
-                    <label for="role">User Role</label>
-                    <select id="role" name="role" required>
-                        <option value="" disabled selected>Select Role</option>
-                        <option value="customer">Customer</option>
-                        <option value="seller">Seller</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" name="submit" class="btn">Register</button>
-
-                <!-- Sign In Button -->
-                <div class="sign-in-btn">
-                    <p>Already have an account? <a href="login.php">Sign In</a></p>
-                </div>
-            </form>
-        </div>
+            <!-- Sign In Button -->
+            <div class="sign-in-btn">
+                <p>Already have an account? <a href="login.php">Sign In</a></p>
+            </div>
+        </form>
     </div>
-
-    <script>
-        // This is optional: you can add a toggle button for light/dark mode
-        const body = document.querySelector('body');
-        
-        // Function to toggle light mode
-        function toggleLightMode() {
-            body.classList.toggle('light-mode');
-        }
-        
-        // You can use this function with a button if needed
-        // document.getElementById('toggleBtn').addEventListener('click', toggleLightMode);
-        
-        document.querySelector('form').addEventListener('submit', function(event) {
-        const roleSelect = document.getElementById('role');
-        const selectedRole = roleSelect.value;
-
-        if (!selectedRole) {
-            event.preventDefault();
-            alert("Please select a role before submitting.");
-        } else {
-            console.log("Role selected:", selectedRole);
-            // Form will submit as normal
-        }
-    });
-
-    </script>
 </body>
 </html>

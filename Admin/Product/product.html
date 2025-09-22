@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management - Seller Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+
+            <a href="../index.html" class="system-back-btn">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+
+
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Product Management</h1>
+                    <p>Manage your product inventory and listings</p>
+                </div>
+               <a id="addProductBtn" href="seller-product.html" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Add Product
+                </a>
+
+            </div>
+
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-box"></i>
+                    <div>
+                        <p>Total Products</p>
+                        <span id="totalProducts">6</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <p>Active Products</p>
+                        <span id="activeProducts">5</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        <p>Low Stock</p>
+                        <span id="lowStockProducts">2</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <div>
+                        <p>Total Sold</p>
+                        <span id="totalSold">570</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Filters -->
+            <div class="filters">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search products...">
+                </div>
+                <div class="filter-controls">
+                    <select id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Fashion">Fashion</option>
+                        <option value="Home & Living">Home & Living</option>
+                        <option value="Beauty & Health">Beauty & Health</option>
+                        <option value="Sports & Outdoors">Sports & Outdoors</option>
+                        <option value="Books & Media">Books & Media</option>
+                        <option value="Automotive">Automotive</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <button id="clearFilters" class="btn btn-outline">
+                        <i class="fas fa-times"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-info">
+                <span id="productCount">Showing 6 of 6 products</span>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="productsGrid" class="products-grid">
+                <!-- Products will be rendered here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i class="fas fa-box"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your filters or search terms</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Product</h2>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="productForm" class="product-form">
+                <div class="form-group">
+                    <label for="productName">Product Name *</label>
+                    <input type="text" id="productName" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productPrice">Price (₱) *</label>
+                        <input type="number" id="productPrice" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock">Stock Quantity *</label>
+                        <input type="number" id="productStock" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="productCategory">Category *</label>
+                    <select id="productCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Fashion">Fashion</option>
+                        <option value="Home & Living">Home & Living</option>
+                        <option value="Beauty & Health">Beauty & Health</option>
+                        <option value="Sports & Outdoors">Sports & Outdoors</option>
+                        <option value="Books & Media">Books & Media</option>
+                        <option value="Automotive">Automotive</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Product Image</label>
+                    <div class="file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop images here or click to browse</p>
+                        <small>PNG, JPG up to 5MB</small>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Product added successfully!</span>
+    </div>
+
+    <script src="product-script.js"></script>
+</body>
+</html>
