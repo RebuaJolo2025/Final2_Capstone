@@ -120,9 +120,10 @@ $result = $stmt->get_result();
                         echo '<div class="step cancelled">Cancelled</div>';
                     } else {
                         foreach ($statuses as $step) {
-                            $class = array_search($step, $statuses) <= array_search($currentStatus, $statuses) ? 'step active' : 'step';
+                            $class = ($step === $currentStatus) ? 'step active' : 'step';
                             echo "<div class=\"$class\">$step</div>";
                         }
+
                     }
                 ?>
             </div>

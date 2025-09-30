@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - InfluenceX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+        body {
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; padding: 20px;
+        }
+
+        .register-container {
+            background: rgba(255,255,255,0.15);
+            padding: 40px 35px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            width: 100%; max-width: 450px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+
+        .register-container h1 {
+            color:#fff;
+            margin-bottom:25px;
+            font-weight:600;
+        }
+
+        .logo {font-size:2.5em;margin-bottom:10px;color:#fff;}
+
+        .form-group {margin-bottom: 18px;text-align:left;}
+        .form-group label {
+            display: block; margin-bottom: 6px; font-size:0.9em; color:#fff;
+        }
+        .form-group input {
+            width: 100%; padding: 12px;
+            font-size: 1em; border: none;
+            border-radius: 8px;
+            outline: none;
+            background: rgba(255,255,255,0.85);
+            transition: 0.3s;
+        }
+        .form-group input:focus {
+            border: 2px solid #2196F3;
+            background: #fff;
+        }
+
+        .btn {
+            width: 100%; padding: 12px;
+            background: linear-gradient(90deg, #2196F3, #4CAF50);
+            color: white; font-size: 1.1em;
+            border: none; border-radius: 8px;
+            cursor: pointer; font-weight:600;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+
+        .sign-in-btn {
+            margin-top:15px;font-size:0.9em;color:#fff;text-align:center;
+        }
+        .sign-in-btn a {
+            color:#FFD700;font-weight:bold;text-decoration:none;
+        }
+        .sign-in-btn a:hover {text-decoration:underline;}
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo"><i class="fa-solid fa-user-plus"></i></div>
+        <h1>Register For Seller</h1>
+        <form action="seller_process.php" method="post">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" name="submit" class="btn">Register</button>
+
+            <!-- Sign In Button -->
+            <div class="sign-in-btn">
+                <p>Already have an account? <a href="login.php">Sign In</a></p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
