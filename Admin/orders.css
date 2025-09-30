@@ -45,6 +45,14 @@
             transform: translateY(-50%);
         }
 
+        .header-left {
+            position: absolute;
+            left: 30px;       /* move to left side */
+            top: 50%;
+            transform: translateY(-50%); /* center vertically */
+        }
+
+
         /* Way Bills button */
         .btn-waybills {
             padding: 10px 20px;

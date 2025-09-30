@@ -68,6 +68,9 @@ if ($result->num_rows > 0) {
             <div class="header-right">
                 <button class="btn-waybills" onclick="window.location.href='waybill.php'">Way Bills</button>
             </div>
+            <div class="header-left">
+                <button class="btn-waybills" onclick="window.history.back();">← Back</button>
+            </div>
         </div>
     </div>
 
