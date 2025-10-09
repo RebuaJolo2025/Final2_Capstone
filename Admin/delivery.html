@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RTW Analytics Hub - Deliveries</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --accent:#4f46e5;
+    --muted:#6b7280;
+    --success:#16a34a;
+    --warning:#eab308;
+    --danger:#dc2626;
+    --info:#0284c7;
+  }
+  body { font-family:"Segoe UI",Arial,sans-serif; margin:0; background:var(--bg); color:#111827; }
+  header {
+    background:linear-gradient(90deg,var(--accent),#4338ca);
+    color:white; padding:1rem 1.5rem;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  header h1 { margin:0; font-size:1.25rem; }
+  .back-btn {
+    background:rgba(255,255,255,0.12);
+    color:white; border:0; padding:0.45rem 0.9rem;
+    border-radius:8px; cursor:pointer; font-weight:600;
+  }
+  .container { max-width:1200px; margin:1.25rem auto; padding:0 1rem; }
+  .metrics {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:1rem; margin-bottom:1rem;
+  }
+  .card {
+    background:var(--card); border-radius:12px; padding:1rem;
+    box-shadow:0 6px 18px rgba(17,24,39,0.06);
+  }
+  .metric-title { color:var(--muted); font-size:0.85rem; margin-bottom:0.35rem; }
+  .metric-value { font-size:1.4rem; font-weight:700; }
+  .grid { display:grid; grid-template-columns:1fr 420px; gap:1rem; margin-bottom:1rem; }
+  @media(max-width:980px){ .grid{grid-template-columns:1fr;} }
+  .chart-card { padding:1rem; border-radius:12px; background:var(--card); box-shadow:0 6px 18px rgba(17,24,39,0.06); }
+  .table-card{ overflow:auto; }
+  table{ width:100%; border-collapse:collapse; min-width:700px; }
+  thead th{
+    text-align:left; font-weight:700; padding:0.75rem;
+    background:#f3f4f6; color:#374151; font-size:0.9rem;
+  }
+  tbody td{ padding:0.7rem; border-bottom:1px solid #eef2f7; font-size:0.9rem; }
+  tbody tr:nth-child(even){ background:#fbfdff; }
+  .badge{
+    display:inline-block; padding:6px 10px; border-radius:999px;
+    font-weight:700; font-size:0.8rem;
+  }
+  .badge.pending{ background:#fef9c3; color:#92400e; }
+  .badge.shipped{ background:#e0f2fe; color:var(--info); }
+  .badge.delivered{ background:#ecfdf5; color:var(--success); }
+  .badge.failed{ background:#fee2e2; color:var(--danger); }
+  .btn {
+    background:var(--accent); color:white;
+    border:0; padding:6px 10px; border-radius:8px;
+    cursor:pointer; font-weight:700; font-size:0.85rem;
+  }
+  .btn.secondary { background:#eef2ff; color:var(--accent); }
+  .actions button{ margin-right:6px; }
+  .small-muted{ color:var(--muted); font-size:0.85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Delivery Status</h1>
+  <div>
+    <button class="back-btn" onclick="location.href='/Caps/Admin/index.html'">← Back to Dashboard</button>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Metrics -->
+  <div class="metrics">
+    <div class="card"><div class="metric-title">Total Orders</div><div class="metric-value" id="totalOrders">0</div></div>
+    <div class="card"><div class="metric-title">Pending</div><div class="metric-value" id="pendingOrders">0</div></div>
+    <div class="card"><div class="metric-title">Shipped</div><div class="metric-value" id="shippedOrders">0</div></div>
+    <div class="card"><div class="metric-title">Delivered</div><div class="metric-value" id="deliveredOrders">0</div></div>
+  </div>
+
+  <!-- Charts + Table -->
+  <div class="grid">
+    <div>
+      <div class="chart-card card">
+        <strong>Deliveries by Status</strong>
+        <div class="small-muted" style="margin-bottom:0.6rem">Overview of all active deliveries</div>
+        <canvas id="statusChart" height="240"></canvas>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="chart-card card">
+        <strong>Monthly Deliveries</strong>
+        <div class="small-muted" style="margin-bottom:0.6rem">Completed deliveries by month</div>
+        <canvas id="monthlyChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <strong>Recent Deliveries</strong>
+      <div class="small-muted" style="margin-bottom:0.6rem">Update delivery progress</div>
+      <table id="deliveryTable">
+        <thead>
+          <tr><th>Order ID</th><th>Customer</th><th>Status</th><th>Date</th><th style="text-align:right">Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let deliveries = [
+  {id:"ORD101", customer:"Jane Doe", status:"Pending", date:"2025-09-27"},
+  {id:"ORD102", customer:"Mark Smith", status:"Shipped", date:"2025-09-28"},
+  {id:"ORD103", customer:"Sara Lee", status:"Delivered", date:"2025-09-28"},
+  {id:"ORD104", customer:"John Carter", status:"Pending", date:"2025-09-29"},
+  {id:"ORD105", customer:"Alex Park", status:"Failed", date:"2025-09-29"}
+];
+
+let statusChart, monthlyChart;
+
+function renderMetrics(){
+  document.getElementById("totalOrders").innerText = deliveries.length;
+  document.getElementById("pendingOrders").innerText = deliveries.filter(d=>d.status==="Pending").length;
+  document.getElementById("shippedOrders").innerText = deliveries.filter(d=>d.status==="Shipped").length;
+  document.getElementById("deliveredOrders").innerText = deliveries.filter(d=>d.status==="Delivered").length;
+}
+
+function statusBadge(status){
+  let cls="badge";
+  if(status==="Pending") cls+=" pending";
+  if(status==="Shipped") cls+=" shipped";
+  if(status==="Delivered") cls+=" delivered";
+  if(status==="Failed") cls+=" failed";
+  return `<span class="${cls}">${status}</span>`;
+}
+
+function actionButtons(order){
+  if(order.status==="Pending"){
+    return `<button class="btn" data-action="ship" data-id="${order.id}">Ship</button>`;
+  }
+  if(order.status==="Shipped"){
+    return `<button class="btn secondary" data-action="deliver" data-id="${order.id}">Mark Delivered</button>`;
+  }
+  return `<button class="btn secondary" data-action="view" data-id="${order.id}">View</button>`;
+}
+
+function renderTable(){
+  const tbody=document.querySelector("#deliveryTable tbody");
+  tbody.innerHTML="";
+  deliveries.slice().reverse().forEach(d=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${d.id}</td><td>${d.customer}</td><td>${statusBadge(d.status)}</td><td>${d.date}</td><td style="text-align:right">${actionButtons(d)}</td>`;
+    tbody.appendChild(tr);
+  });
+  attachHandlers();
+}
+
+function attachHandlers(){
+  document.querySelectorAll("#deliveryTable button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const action=btn.dataset.action;
+      const id=btn.dataset.id;
+      const idx=deliveries.findIndex(d=>d.id===id);
+      if(idx<0) return;
+      if(action==="ship"){ deliveries[idx].status="Shipped"; }
+      if(action==="deliver"){ deliveries[idx].status="Delivered"; }
+      if(action==="view"){ alert(JSON.stringify(deliveries[idx],null,2)); return; }
+      deliveries[idx].date=new Date().toISOString().slice(0,10);
+      renderAll();
+    });
+  });
+}
+
+function createCharts(){
+  statusChart=new Chart(document.getElementById("statusChart").getContext("2d"),{
+    type:"doughnut",
+    data:{labels:["Pending","Shipped","Delivered","Failed"],datasets:[{data:[],backgroundColor:["#facc15","#38bdf8","#22c55e","#ef4444"]}]},
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+
+  monthlyChart=new Chart(document.getElementById("monthlyChart").getContext("2d"),{
+    type:"bar",
+    data:{labels:[],datasets:[{label:"Deliveries",data:[],backgroundColor:varAccent()}]},
+    options:{scales:{y:{beginAtZero:true}}}
+  });
+}
+
+function varAccent(){ return getComputedStyle(document.documentElement).getPropertyValue("--accent"); }
+
+function updateCharts(){
+  const counts={Pending:0,Shipped:0,Delivered:0,Failed:0};
+  deliveries.forEach(d=>counts[d.status]++);
+  statusChart.data.datasets[0].data=[counts.Pending,counts.Shipped,counts.Delivered,counts.Failed];
+  statusChart.update();
+
+  const months=[];const vals=[];
+  const now=new Date();
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const key=d.toLocaleString(undefined,{month:"short",year:"numeric"});
+    months.push(key); vals.push(0);
+  }
+  deliveries.forEach(d=>{
+    if(d.status!=="Delivered") return;
+    const dt=new Date(d.date);
+    const key=dt.toLocaleString(undefined,{month:"short",year:"numeric"});
+    const idx=months.indexOf(key);
+    if(idx>=0) vals[idx]++;
+  });
+  monthlyChart.data.labels=months;
+  monthlyChart.data.datasets[0].data=vals;
+  monthlyChart.update();
+}
+
+function renderAll(){
+  renderMetrics();
+  renderTable();
+  updateCharts();
+}
+
+function init(){
+  createCharts();
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>

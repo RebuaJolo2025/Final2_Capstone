@@ -2,16 +2,17 @@
 session_start();
 include '../conn.php';
 
-// Fetch single seller info
+// Fetch seller info
 $sellerResult = $conn->query("SELECT fullname, email, address, phonenumber FROM seller LIMIT 1");
 $seller = $sellerResult->fetch_assoc();
 
 // Fetch all processing orders
 $sql = "
-SELECT DISTINCT
+SELECT 
     o.id, 
     o.email AS customer_email, 
     u.fullname AS customer_name, 
+    u.address AS customer_address,
     o.product_name, 
     o.quantity, 
     o.order_total, 
@@ -27,183 +28,269 @@ $result = $conn->query($sql);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Waybills</title>
-<style>
-body { 
-    font-family: Arial, sans-serif; 
-    background: #f4f6f9; 
-    margin: 0; 
-    padding: 10px 20px; 
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waybills</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
 
-.waybill-container { 
-    max-width: 1000px; 
-    margin: 0 auto; 
-}
+        .waybill-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+        }
 
-h1 { 
-    text-align: center; 
-    margin: 10px 0 20px 0; 
-}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
 
-.waybill { 
-    border: 2px solid #333; 
-    padding: 20px; 
-    margin-bottom: 20px; 
-    border-radius: 10px; 
-    background: white; 
-    page-break-inside: avoid;
-}
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            color: #333;
+            margin: 0;
+        }
 
-.waybill-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 15px; 
-}
+        .waybill {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 8px;
+        }
 
-.grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 10px; 
-    margin-bottom: 15px; 
-}
+        .waybill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f1f1;
+        }
 
-.grid div { padding: 5px; }
-.grid .label { font-weight: bold; color: #333; }
+        .waybill-header h2 {
+            color: #FF5722;
+        }
 
-.product-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    margin-top: 10px; 
-}
+        .waybill-header .date {
+            font-size: 14px;
+            color: #777;
+        }
 
-.product-table th, .product-table td { 
-    border: 1px solid #333; 
-    padding: 8px; 
-    text-align: center; 
-    font-size: 14px; 
-}
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-.product-table th { background: #f0f0f0; }
+        .grid div {
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
 
-.btn-print { 
-    display: block; 
-    margin: 20px auto; 
-    padding: 10px 20px; 
-    background: #4CAF50; 
-    color: white; 
-    border: none; 
-    border-radius: 6px; 
-    cursor: pointer; 
-}
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
 
-/* Back Button Style */
-.btn-back {
-    display: inline-block;
-    margin-bottom: 15px;
-    padding: 10px 20px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-.btn-back:hover {
-    background: #5a67d8;
-    transform: translateY(-2px);
-}
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+        }
 
-/* Print Styles */
-@media print {
-    body { background: white; padding: 0; }
-    .btn-print, .btn-back { display: none; }
-    .waybill { page-break-inside: avoid; margin-bottom: 30px; }
-    .waybill-container { max-width: 100%; }
-}
-</style>
+        .product-table th, .product-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .product-table th {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .product-table td {
+            color: #555;
+        }
+
+        .btn-print {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .btn-back:hover {
+            background-color: #5a67d8;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .btn-print, .btn-back {
+                display: none;
+            }
+
+            .waybill-container {
+                max-width: 100%;
+            }
+
+            .waybill {
+                page-break-inside: avoid;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="waybill-container">
 
-    <!-- Back Button -->
+    <div class="header">
+        <h1>Waybill</h1>
+    </div>
+
     <button class="btn-back" onclick="window.history.back();">← Back</button>
 
-    <h1>Waybills</h1>
+    <?php 
+    if ($result->num_rows > 0): 
+        $orders = [];
 
-    <?php if($result->num_rows > 0): ?>
-        <?php while($row = $result->fetch_assoc()): ?>
-            <div class="waybill">
-                <!-- Header -->
-                <div class="waybill-header">
-                    <h2>Order #<?= $row['id'] ?></h2>
-                    <div><strong>Date:</strong> <?= date('M d, Y', strtotime($row['order_date'])) ?></div>
+        while ($row = $result->fetch_assoc()) {
+            $orderId = $row['id'];
+            $orders[$orderId]['order'] = $row;
+            $orders[$orderId]['products'][] = $row;
+        }
+
+        foreach ($orders as $order):
+            $first_product = $order['products'][0];
+
+            // Group products by name and sum quantities and totals
+            $groupedProducts = [];
+            foreach ($order['products'] as $product) {
+                $name = $product['product_name'];
+                if (!isset($groupedProducts[$name])) {
+                    $groupedProducts[$name] = [
+                        'quantity' => $product['quantity'],
+                        'total' => $product['order_total']
+                    ];
+                } else {
+                    $groupedProducts[$name]['quantity'] += $product['quantity'];
+                    $groupedProducts[$name]['total'] += $product['order_total'];
+                }
+            }
+    ?>
+        <div class="waybill">
+            <!-- Header -->
+            <div class="waybill-header">
+                <h2>Order #<?= $first_product['id'] ?></h2>
+                <div class="date"><strong>Date:</strong> <?= date('M d, Y', strtotime($first_product['order_date'])) ?></div>
+            </div>
+
+            <!-- Seller & Customer Info -->
+            <div class="grid">
+                <div>
+                    <div class="label">Seller Information:</div>
+                    <div>
+                        <strong><?= htmlspecialchars($seller['fullname']) ?></strong><br>
+                        📍 <?= htmlspecialchars($seller['address']) ?><br>
+                        📞 <?= htmlspecialchars($seller['phonenumber']) ?><br>
+                        ✉️ <?= htmlspecialchars($seller['email']) ?>
+                    </div>
                 </div>
-
-                <!-- Seller & Customer Info -->
-                <div class="grid">
+                <div>
+                    <div class="label">Customer Information:</div>
                     <div>
-                        <div class="label">Seller:</div>
-                        <div>
-                            <?= htmlspecialchars($seller['fullname']) ?><br>
-                            <?= htmlspecialchars($seller['address']) ?><br>
-                            <?= htmlspecialchars($seller['phonenumber']) ?><br>
-                            <?= htmlspecialchars($seller['email']) ?>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="label">Customer:</div>
-                        <div>
-                            <?= htmlspecialchars($row['customer_name']) ?><br>
-                            <?= htmlspecialchars($row['customer_email']) ?>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product Info -->
-                <table class="product-table">
-                    <thead>
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><?= htmlspecialchars($row['product_name']) ?></td>
-                            <td><?= $row['quantity'] ?></td>
-                            <td>₱<?= number_format($row['order_total'] / $row['quantity'], 2) ?></td>
-                            <td>₱<?= number_format($row['order_total'], 2) ?></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Footer / Notes -->
-                <div class="grid" style="margin-top:20px;">
-                    <div>
-                        <div class="label">Notes:</div>
-                        <div>Handle with care</div>
-                    </div>
-                    <div>
-                        <div class="label">Signature:</div>
-                        <div>_____________________</div>
+                        <strong><?= htmlspecialchars($first_product['customer_name']) ?></strong><br>
+                        <?= htmlspecialchars($first_product['customer_email']) ?><br>
+                        📍 <?= htmlspecialchars($first_product['customer_address'] ?? 'No address provided') ?>
                     </div>
                 </div>
             </div>
-        <?php endwhile; ?>
 
-        <button class="btn-print" onclick="window.print()">Print All Waybills</button>
+            <!-- Product Table -->
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($groupedProducts as $productName => $data): 
+                        $price_per_unit = $data['total'] / $data['quantity'];
+                    ?>
+                        <tr>
+                            <td><?= htmlspecialchars($productName) ?></td>
+                            <td><?= $data['quantity'] ?></td>
+                            <td>₱<?= number_format($price_per_unit, 2) ?></td>
+                            <td>₱<?= number_format($data['total'], 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <!-- Footer -->
+            <div class="grid" style="margin-top: 20px;">
+                <div>
+                    <div class="label">Notes:</div>
+                    <div>Handle with care</div>
+                </div>
+                <div>
+                    <div class="label">Signature:</div>
+                    <div>_____________________</div>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
+
+    <button class="btn-print" onclick="window.print()">🖨 Print All Waybills</button>
 
     <?php else: ?>
-        <p style="text-align:center;">No orders ready for waybill.</p>
+        <p style="text-align: center;">No orders ready for waybill.</p>
     <?php endif; ?>
+
 </div>
 
 </body>
