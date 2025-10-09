@@ -43,21 +43,19 @@
                         <li><a href="#dashboard" class="nav-link active" data-page="dashboard">
                             <i data-lucide="home"></i><span>Dashboard</span>
                         </a></li>
-                        <li><a href="#revenue" class="nav-link" data-page="revenue">
-                            <i data-lucide="trending-up"></i><span>Revenue Analytics</span>
-                        </a></li>
-                        <li><a href="" class="nav-link" data-page="sales">
+                        <li><a href="/Caps/Admin/sales.html" class="nav-link">
                             <i data-lucide="bar-chart-3"></i><span>Sales Analytics</span>
                         </a></li>
                         <li>
                             <a href="/Caps/Admin/Product/product.html" class="nav-link">
                                 <i data-lucide="package"></i><span>Products</span>
                             </a>
-                            </li>
-
-                        <li><a href="#payments" class="nav-link" data-page="payments">
-                            <i data-lucide="credit-card"></i><span>Payments</span>
-                        </a></li>
+                        </li>
+                        <li>
+                            <a href="/Caps/Admin/payments.html" class="nav-link">
+                                <i data-lucide="credit-card"></i><span>Payments</span>
+                            </a>
+                        </li>
                         <li><a href="/Caps/Admin/orders.php" class="nav-link">
                             <i data-lucide="shopping-bag"></i><span>Transactions</span>
                         </a></li>
@@ -67,18 +65,26 @@
                 <div class="nav-section">
                     <h3 class="nav-section-title">Management</h3>
                     <ul class="nav-list">
-                        <li><a href="#profiles" class="nav-link" data-page="profiles">
-                            <i data-lucide="users"></i><span>Profile Reports</span>
-                        </a></li>
-                        <li><a href="#refunds" class="nav-link" data-page="refunds">
-                            <i data-lucide="refresh-cw"></i><span>Refunds</span>
-                        </a></li>
-                        <li><a href="#delivery" class="nav-link" data-page="delivery">
-                            <i data-lucide="truck"></i><span>Delivery Status</span>
-                        </a></li>
-                        <li><a href="#settings" class="nav-link" data-page="settings">
-                            <i data-lucide="settings"></i><span>Settings</span>
-                        </a></li>
+                        <li>
+                            <a href="/Caps/Admin/profiles.html" class="nav-link">
+                                <i data-lucide="users"></i><span>Profile Reports</span>
+                            </a>
+                        </li> 
+                        <li>
+                            <a href="/Caps/Admin/refunds.html" class="nav-link">
+                                <i data-lucide="refresh-cw"></i><span>Refunds</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Caps/Admin/delivery.html" class="nav-link">
+                                <i data-lucide="truck"></i><span>Delivery Status</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Caps/Admin/settings.html" class="nav-link">
+                                <i data-lucide="settings"></i><span>Settings</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -99,11 +105,7 @@
                 </div>
                 
                 <div class="header-right">
-                    <button class="header-btn notification-btn">
-                        <i data-lucide="bell"></i>
-                        <span class="notification-badge"></span>
-                    </button>
-                    
+                    <!-- 🧹 Notification button removed -->
                     <div class="user-menu">
                         <button class="user-avatar" id="userMenuToggle">
                             <span>AD</span>
@@ -126,7 +128,6 @@
 
             <!-- Page Content -->
             <div class="page-content">
-                <!-- Dashboard Page -->
                 <div id="dashboard-page" class="page active">
                     <div class="page-header">
                         <h1>Dashboard Overview</h1>
@@ -184,7 +185,7 @@
                         </div>
                     </div>
 
-                    <!-- Charts Section -->
+                    <!-- Charts -->
                     <div class="charts-grid">
                         <div class="chart-card">
                             <div class="chart-header">
@@ -207,7 +208,7 @@
                         </div>
                     </div>
 
-                    <!-- Secondary Metrics -->
+                    <!-- Additional Metrics -->
                     <div class="metrics-grid">
                         <div class="metric-card">
                             <div class="metric-header">
@@ -254,29 +255,23 @@
                         </div>
                     </div>
 
-                    <!-- Data Tables -->
+                    <!-- Tables -->
                     <div class="tables-grid">
                         <div class="table-card">
                             <div class="table-header">
                                 <h3>Top Selling Products</h3>
                             </div>
-                            <div class="table-content" id="topProductsTable">
-                                <!-- Content will be populated by JavaScript -->
-                            </div>
+                            <div class="table-content" id="topProductsTable"></div>
                         </div>
 
                         <div class="table-card">
                             <div class="table-header">
                                 <h3>Recent Transactions</h3>
                             </div>
-                            <div class="table-content" id="recentTransactionsTable">
-                                <!-- Content will be populated by JavaScript -->
-                            </div>
+                            <div class="table-content" id="recentTransactionsTable"></div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Add more pages as needed -->
             </div>
         </main>
     </div>

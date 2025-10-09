@@ -2,12 +2,53 @@
 session_start();
 include 'conn.php';
 
+// Ensure user is logged in
 if (!isset($_SESSION['email'])) {
-    echo "<script>alert('Login first'); window.location.href='login.php';</script>";
+    echo "<script>alert('Please log in first.'); window.location.href='login.php';</script>";
     exit;
 }
 
 $email = $_SESSION['email'];
+
+/* -------------------- ADD TO CART -------------------- */
+if (isset($_GET['add'])) {
+    $product_id = intval($_GET['add']);
+    $qty = isset($_GET['qty']) ? intval($_GET['qty']) : 1;
+
+    // Fetch product info
+    $product = mysqli_query($conn, "SELECT * FROM products WHERE id='$product_id'");
+    if (mysqli_num_rows($product) > 0) {
+        $p = mysqli_fetch_assoc($product);
+
+        // Check if product already exists in user's cart
+        $check = mysqli_query($conn, "SELECT * FROM cart WHERE product_id='$product_id' AND email='$email'");
+        if (mysqli_num_rows($check) > 0) {
+            // Update quantity if already exists
+            mysqli_query($conn, "UPDATE cart SET quantity = quantity + $qty WHERE product_id='$product_id' AND email='$email'");
+        } else {
+            // Insert new item
+            mysqli_query($conn, "INSERT INTO cart (email, product_id, product_name, product_price, image, quantity)
+                                 VALUES ('$email', '$product_id', '{$p['name']}', '{$p['price']}', '{$p['image']}', '$qty')");
+        }
+
+        echo "<script>alert('Item added to cart successfully!'); window.location.href='cart.php';</script>";
+        exit;
+    } else {
+        echo "<script>alert('Product not found.'); window.location.href='index.php';</script>";
+        exit;
+    }
+}
+
+/* -------------------- DELETE SELECTED -------------------- */
+if (isset($_POST['delete_selected']) && !empty($_POST['selected_items'])) {
+    $selected = $_POST['selected_items'];
+    $ids = implode(",", array_map('intval', $selected));
+    mysqli_query($conn, "DELETE FROM cart WHERE id IN ($ids) AND email='$email'");
+    echo "<script>alert('Selected items deleted successfully!'); window.location.href='cart.php';</script>";
+    exit;
+}
+
+/* -------------------- DISPLAY CART -------------------- */
 $query = "SELECT * FROM cart WHERE email='$email'";
 $result = mysqli_query($conn, $query);
 $total = 0;
@@ -17,7 +58,7 @@ $total = 0;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cart</title>
+    <title>Your Cart</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -105,10 +146,10 @@ $total = 0;
             font-size: 1.2em;
             margin-top: 20px;
         }
-        .checkout-btn {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
+        .checkout-btn, .delete-btn {
+            display: inline-block;
+            width: 180px;
+            margin: 10px;
             background: #4CAF50;
             color: white;
             padding: 12px;
@@ -119,42 +160,52 @@ $total = 0;
             border: none;
             cursor: pointer;
         }
+        .delete-btn {
+            background: #E53935;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-<!-- ✅ Updated button text and link -->
 <a href="index.php" class="back-profile">← Back to Shop</a>
 
 <div class="cart-container">
     <h1>Your Cart</h1>
 
     <?php if (mysqli_num_rows($result) > 0): ?>
-        <form action="checkout.php" method="POST" id="cart-form">
+        <form action="cart.php" method="POST" id="cart-form">
             <?php while ($row = mysqli_fetch_assoc($result)): 
                 $id = $row['id'];
                 $name = $row['product_name'];
                 $price = $row['product_price'];
                 $image = $row['image'];
-                $total += $price;
+                $quantity = $row['quantity'];
             ?>
                 <div class="cart-item" data-id="<?= $id ?>">
-                    <input type="checkbox" name="selected_items[]" value="<?= $id ?>" class="item-checkbox" data-price="<?= $price ?>">
-                    <img src="<?= $image ?>" alt="<?= $name ?>">
+                    <input type="checkbox" name="selected_items[]" value="<?= $id ?>" class="item-checkbox" data-price="<?= $price ?>" data-qty="<?= $quantity ?>">
+                    <img src="<?= $image ?>" alt="<?= htmlspecialchars($name) ?>">
                     <div class="cart-details">
-                        <h3><?= $name ?></h3>
+                        <h3><?= htmlspecialchars($name) ?></h3>
                         <p class="price">₱<?= number_format($price, 2) ?></p>
                         <div class="quantity-control">
                             <button type="button" class="decrease">−</button>
-                            <input type="number" name="quantities[<?= $id ?>]" class="quantity" value="1" min="1" data-price="<?= $price ?>">
+                            <input type="number" name="quantities[<?= $id ?>]" class="quantity" value="<?= $quantity ?>" min="1" data-price="<?= $price ?>">
                             <button type="button" class="increase">+</button>
                         </div>
                     </div>
                 </div>
             <?php endwhile; ?>
 
-            <div class="total">Total: ₱<span id="total-price"><?= number_format($total, 2) ?></span></div>
-            <button type="submit" class="checkout-btn">Checkout</button>
+            <div class="total">Total: ₱<span id="total-price">0.00</span></div>
+
+            <div class="btn-container">
+                <button type="submit" name="delete_selected" class="delete-btn" onclick="return confirm('Delete selected items?')">🗑 Delete Selected</button>
+                <button type="submit" formaction="checkout.php" class="checkout-btn">✅ Checkout</button>
+            </div>
         </form>
     <?php else: ?>
         <p>No items in your cart.</p>

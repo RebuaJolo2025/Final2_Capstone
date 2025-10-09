@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTW Analytics Hub - Payments</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #f8fafc;
+      color: #333;
+    }
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .metric-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .metric-title {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #222;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .chart-card h3 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #444;
+    }
+    .table-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead {
+      background: #f1f5f9;
+    }
+    th, td {
+      padding: 0.9rem 0.75rem;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    th {
+      color: #555;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #f9fafb;
+    }
+    .status {
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .status.success { background:#e6f9ed; color:#16a34a; }
+    .status.pending { background:#fff4e6; color:#ea580c; }
+    .status.failed { background:#fde2e1; color:#dc2626; }
+    .method {
+      font-weight: 600;
+      color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon"><i data-lucide="bar-chart-3"></i></div>
+          <div class="brand-text"><h2>RTW Admin</h2><p>Payments</p></div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li><a href="/Caps/Admin/index.html" class="nav-link"><i data-lucide="home"></i><span>Dashboard</span></a></li>
+          <li><a href="/Caps/Admin/payments.html" class="nav-link active"><i data-lucide="credit-card"></i><span>Payments</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="dashboard-header">
+        <h1>Payments Overview</h1>
+        <p>Track how many customers pay using COD vs Online.</p>
+      </header>
+
+      <!-- Metrics -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-title">Total Payments</div>
+          <div class="metric-value">$98,452</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">COD Customers</div>
+          <div class="metric-value" id="codCount">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Online Customers</div>
+          <div class="metric-value" id="onlineCount">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Refunded</div>
+          <div class="metric-value">$4,230</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>COD vs Online Distribution</h3>
+          <canvas id="codVsOnlineChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Payments Trend</h3>
+          <canvas id="paymentsTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <h3>Recent Payments</h3>
+        <table id="paymentsTable">
+          <thead>
+            <tr>
+              <th>ID</th><th>Customer</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>#TXN1023</td><td>Jane Doe</td><td>$120.50</td><td class="method">Online</td><td><span class="status success">Completed</span></td><td>2025-09-29</td></tr>
+            <tr><td>#TXN1024</td><td>Mark Smith</td><td>$85.00</td><td class="method">COD</td><td><span class="status pending">Pending</span></td><td>2025-09-30</td></tr>
+            <tr><td>#TXN1025</td><td>Sara Lee</td><td>$200.75</td><td class="method">Online</td><td><span class="status failed">Failed</span></td><td>2025-09-30</td></tr>
+            <tr><td>#TXN1026</td><td>John Carter</td><td>$45.99</td><td class="method">COD</td><td><span class="status success">Completed</span></td><td>2025-09-30</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Count COD vs Online
+    let codCount = 0, onlineCount = 0;
+    document.querySelectorAll("#paymentsTable tbody tr").forEach(row => {
+      const method = row.cells[3].innerText.trim();
+      if (method === "COD") codCount++;
+      if (method === "Online") onlineCount++;
+    });
+    document.getElementById("codCount").innerText = codCount;
+    document.getElementById("onlineCount").innerText = onlineCount;
+
+    // COD vs Online Chart
+    new Chart(document.getElementById("codVsOnlineChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["COD", "Online"],
+        datasets: [{
+          data: [codCount, onlineCount],
+          backgroundColor: ["#f97316", "#22c55e"]
+        }]
+      },
+      options: { plugins: { legend: { position: "bottom" } } }
+    });
+
+    // Payments Trend Chart
+    new Chart(document.getElementById("paymentsTrendChart"), {
+      type: "line",
+      data: {
+        labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"],
+        datasets: [
+          { label:"COD", data:[120,150,180,160,200,230,250,240,260], borderColor:"#f97316", fill:false },
+          { label:"Online", data:[300,320,350,370,400,420,450,480,500], borderColor:"#22c55e", fill:false }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
