@@ -14,9 +14,16 @@ if (isset($_GET['product_id']) && is_numeric($_GET['product_id'])) {
 
         // Decode images JSON
         $images = json_decode($product['images'], true);
-        $mainImage = 'Admin/Product/uploads/products/placeholder.jpg';
-        if (is_array($images) && count($images) > 0 && isset($images[0]['url'])) {
-            $mainImage = 'Admin/Product/' . $images[0]['url'];
+        $mainImage = 'img/icon.png'; // Default placeholder
+        
+        if (is_array($images) && count($images) > 0) {
+            if (is_array($images[0]) && isset($images[0]['url'])) {
+                // If images are objects with url property
+                $mainImage = 'Admin/Product/' . $images[0]['url'];
+            } elseif (is_string($images[0])) {
+                // If images are direct file paths (our current format)
+                $mainImage = 'Admin/Product/' . $images[0];
+            }
         }
     } else {
         echo "<p>Product not found.</p>";
@@ -66,7 +73,12 @@ mysqli_close($conn);
         .product-gallery { flex: 1; }
         .product-gallery img.main-image {
             width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            object-position: center;
+            background-color: #f8f9fa;
             border-radius: 10px;
+            border: 1px solid #e9ecef;
         }
         .thumbnails {
             display: flex;
@@ -171,13 +183,23 @@ mysqli_close($conn);
 
 <section class="product-detail">
     <div class="product-gallery">
-        <img id="mainImage" src="<?php echo htmlspecialchars($mainImage); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="main-image">
+        <img id="mainImage" src="<?php echo htmlspecialchars($mainImage); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="main-image" 
+             onerror="this.src='img/icon.png'; this.onerror=null;">
         
         <?php if (!empty($images) && is_array($images) && count($images) > 1): ?>
         <div class="thumbnails">
-            <?php foreach ($images as $img): ?>
-                <img src="Admin/Product/<?php echo htmlspecialchars($img['url']); ?>" onclick="document.getElementById('mainImage').src=this.src;">
-            <?php endforeach; ?>
+            <?php foreach ($images as $img): 
+                $thumbSrc = '';
+                if (is_array($img) && isset($img['url'])) {
+                    $thumbSrc = 'Admin/Product/' . $img['url'];
+                } elseif (is_string($img)) {
+                    $thumbSrc = 'Admin/Product/' . $img;
+                }
+                if ($thumbSrc): ?>
+                    <img src="<?php echo htmlspecialchars($thumbSrc); ?>" 
+                         onclick="document.getElementById('mainImage').src=this.src;"
+                         onerror="this.src='img/icon.png'; this.onerror=null;">
+            <?php endif; endforeach; ?>
         </div>
         <?php endif; ?>
     </div>

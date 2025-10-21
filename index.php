@@ -126,7 +126,9 @@
     .product-item img {
       width: 100%;
       height: 230px;
-      object-fit: cover;
+      object-fit: contain;
+      object-position: center;
+      background-color: #f8f9fa;
       border-bottom: 3px solid #f4b400;
     }
 
@@ -223,12 +225,20 @@
     if ($result && mysqli_num_rows($result) > 0) {
         while($row = mysqli_fetch_assoc($result)) {
             $images = json_decode($row['images'], true);
-            $mainImage = 'Admin/Product/uploads/products/placeholder.jpg';
-            if (is_array($images) && count($images) > 0 && isset($images[0]['url'])) {
-                $mainImage = 'Admin/Product/' . $images[0]['url'];
+            $mainImage = 'img/icon.png'; // Default placeholder (using existing icon)
+            
+            if (is_array($images) && count($images) > 0) {
+                if (is_array($images[0]) && isset($images[0]['url'])) {
+                    // If images are objects with url property
+                    $mainImage = 'Admin/Product/' . $images[0]['url'];
+                } elseif (is_string($images[0])) {
+                    // If images are direct file paths (our current format)
+                    $mainImage = 'Admin/Product/' . $images[0];
+                }
             }
             echo '<div class="product-item">';
-            echo '<img src="' . htmlspecialchars($mainImage) . '" alt="' . htmlspecialchars($row["name"]) . '">';
+            echo '<img src="' . htmlspecialchars($mainImage) . '" alt="' . htmlspecialchars($row["name"]) . '" 
+                       onerror="this.src=\'img/icon.png\'; this.onerror=null;">';
             echo '<h3>' . htmlspecialchars($row["name"]) . '</h3>';
             echo '<p>₱' . number_format($row["price"], 2) . '</p>';
             echo '<a href="product-detail.php?product_id=' . htmlspecialchars($row["id"]) . '" class="buy-now">View Details</a>';

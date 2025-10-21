@@ -121,7 +121,11 @@ function renderProducts() {
         productsGrid.innerHTML = filtered.map(product => `
             <div class="product-card">
                 <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}" loading="lazy">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="image-placeholder" style="display:none; width:100%; height:200px; background:#f3f4f6; align-items:center; justify-content:center; color:#9ca3af; font-size:14px;">
+                        📷 No Image
+                    </div>
                     <div class="product-actions">
                         <div class="action-menu">
                             <button class="action-btn" onclick="toggleDropdown(${product.id})">

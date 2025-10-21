@@ -223,25 +223,32 @@
         let productTags = [];
         let isLoading = false;
 
-        // Load draft on page load
-        window.addEventListener('load', () => {
-            // Clear any saved draft so form starts fresh
-            localStorage.removeItem('productDraft');
-
-            // Reset all inputs
-            document.getElementById('productForm').reset();
-            productImages = [];
-            productTags = [];
-            renderImages();
-            renderTags();
-
-            console.log('Form cleared on page load');
-        });
-
+        // Initialize form on page load
+        function initializeForm() {
+            // Check if we want to load draft or start fresh
+            const urlParams = new URLSearchParams(window.location.search);
+            const clearDraft = urlParams.get('clear') === 'true';
+            
+            if (clearDraft) {
+                // Clear any saved draft so form starts fresh
+                localStorage.removeItem('productDraft');
+                // Reset all inputs
+                document.getElementById('productForm').reset();
+                productImages = [];
+                productTags = [];
+                renderImages();
+                renderTags();
+                console.log('Form cleared on page load');
+            } else {
+                // Try to load draft
+                loadDraft();
+            }
+        }
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
+            initializeForm();
             renderImages();
             renderTags();
         });
@@ -260,6 +267,9 @@
                     addTag();
                 }
             });
+            
+            // Setup SKU generation
+            setupSKUGeneration();
         }
 
         function handleFormSubmit(e) {
@@ -432,13 +442,31 @@
                     data.append('images[]', img.file); // img.file is the File object
                 });
 
-                // Send AJAX request to PHP
-                const response = await fetch('save_product.php', {
+                // Send AJAX request to PHP (debug version)
+                console.log('Sending request to debug_save.php...');
+                const response = await fetch('debug_save.php', {
                     method: 'POST',
                     body: data
                 });
 
-                const result = await response.json();
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get response text first to debug
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                // Try to parse as JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    console.error('Response text:', responseText);
+                    throw new Error('Server returned invalid JSON. Check console for details.');
+                }
 
                 if (result.success) {
                     showToast(result.message, 'success');
@@ -489,7 +517,24 @@
                     body: data
                 });
 
-                const result = await response.json();
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get response text first to debug
+                const responseText = await response.text();
+                console.log('Raw response (draft):', responseText);
+
+                // Try to parse as JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('JSON parse error (draft):', e);
+                    console.error('Response text (draft):', responseText);
+                    throw new Error('Server returned invalid JSON for draft. Check console for details.');
+                }
 
                 if (result.success) {
                     showToast(result.message, 'success');
@@ -574,24 +619,29 @@
             }
         }
 
-        // Auto-generate SKU when product name changes
-        document.getElementById('productName').addEventListener('input', function() {
-            const skuField = document.getElementById('sku');
+        // Setup SKU auto-generation
+        function setupSKUGeneration() {
+            const productNameField = document.getElementById('productName');
+            if (productNameField) {
+                productNameField.addEventListener('input', function() {
+                    const skuField = document.getElementById('sku');
 
-            // Only generate SKU if the field is empty
-            if (!skuField.value) {
-                const productName = this.value.trim();
-                if (productName) {
-                    const sku = productName.toUpperCase()
-                        .replace(/[^A-Z0-9]/g, '-')     // Only letters and numbers, replace others with -
-                        .replace(/-+/g, '-')             // Remove multiple consecutive dashes
-                        .substring(0, 20) + '-' +        // Limit first part to 20 chars
-                        Math.random().toString(36).substr(2, 4).toUpperCase(); // Random 4-char suffix
+                    // Only generate SKU if the field is empty
+                    if (!skuField.value) {
+                        const productName = this.value.trim();
+                        if (productName) {
+                            const sku = productName.toUpperCase()
+                                .replace(/[^A-Z0-9]/g, '-')     // Only letters and numbers, replace others with -
+                                .replace(/-+/g, '-')             // Remove multiple consecutive dashes
+                                .substring(0, 20) + '-' +        // Limit first part to 20 chars
+                                Math.random().toString(36).substr(2, 4).toUpperCase(); // Random 4-char suffix
 
-                    skuField.value = sku; // <-- set value instead of placeholder
-                }
+                            skuField.value = sku;
+                        }
+                    }
+                });
             }
-        });
+        }
 
 
         // Auto-save draft every 30 seconds
@@ -603,32 +653,40 @@
             }
         }, 30000);
 
-        // Load draft on page load
-        window.addEventListener('load', () => {
+        // Load draft function
+        function loadDraft() {
             const draft = localStorage.getItem('productDraft');
             if (draft) {
-                const draftData = JSON.parse(draft);
-                // Populate form with draft data
-                document.getElementById('productName').value = draftData.name || '';
-                document.getElementById('description').value = draftData.description || '';
-                document.getElementById('category').value = draftData.category || '';
-                document.getElementById('price').value = draftData.price || '';
-                document.getElementById('comparePrice').value = draftData.comparePrice || '';
-                document.getElementById('stock').value = draftData.stock || '';
-                document.getElementById('sku').value = draftData.sku || '';
-                document.getElementById('weight').value = draftData.weight || '';
-                document.getElementById('length').value = draftData.dimensions?.length || '';
-                document.getElementById('width').value = draftData.dimensions?.width || '';
-                document.getElementById('height').value = draftData.dimensions?.height || '';
-                
-                if (draftData.tags) {
-                    productTags = draftData.tags;
-                    renderTags();
+                try {
+                    const draftData = JSON.parse(draft);
+                    // Populate form with draft data
+                    document.getElementById('productName').value = draftData.name || '';
+                    document.getElementById('description').value = draftData.description || '';
+                    document.getElementById('category').value = draftData.category || '';
+                    document.getElementById('price').value = draftData.price || '';
+                    document.getElementById('comparePrice').value = draftData.comparePrice || '';
+                    document.getElementById('stock').value = draftData.stock || '';
+                    document.getElementById('sku').value = draftData.sku || '';
+                    document.getElementById('weight').value = draftData.weight || '';
+                    document.getElementById('length').value = draftData.dimensions?.length || '';
+                    document.getElementById('width').value = draftData.dimensions?.width || '';
+                    document.getElementById('height').value = draftData.dimensions?.height || '';
+                    
+                    if (draftData.tags) {
+                        productTags = draftData.tags;
+                        renderTags();
+                    }
+                    
+                    console.log('Loaded draft from localStorage');
+                    showToast('Draft loaded successfully', 'success');
+                } catch (error) {
+                    console.error('Error loading draft:', error);
+                    localStorage.removeItem('productDraft'); // Remove corrupted draft
                 }
-                
-                console.log('Loaded draft from localStorage');
             }
-        });
+        }
+
+        // Note: loadDraft is called from initializeForm() in DOMContentLoaded
     </script>
 </body>
 </html>
