@@ -17,7 +17,7 @@
 
     body {
       background-color: #f5f5f5;
-      color: #ffffffff;
+      color: #333;
     }
 
     /* HEADER */
