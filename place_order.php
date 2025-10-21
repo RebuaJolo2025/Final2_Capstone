@@ -9,7 +9,7 @@ if (!isset($_SESSION['email'])) {
 
 $email = $_SESSION['email'];
 
-// Ensure `orders` table exists
+// Ensure `orders` table exists with payment_method column
 $conn->query("
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -17,11 +17,15 @@ CREATE TABLE IF NOT EXISTS orders (
     product_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     order_total DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL DEFAULT 'cod',
     status VARCHAR(50) NOT NULL DEFAULT 'Pending',
     rating INT DEFAULT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ");
+
+// Add payment_method column if it doesn't exist (for existing tables)
+$conn->query("ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50) NOT NULL DEFAULT 'cod' AFTER order_total");
 
 // Array to collect all items to insert
 $items_to_order = [];
@@ -56,11 +60,20 @@ if (!empty($_POST['selected_items']) && is_array($_POST['selected_items'])) {
     }
 }
 
+// Get payment method from POST data
+$payment_method = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'cod';
+
+// Validate payment method
+$allowed_methods = ['cod', 'gcash', 'paymaya', 'bank_transfer'];
+if (!in_array($payment_method, $allowed_methods)) {
+    $payment_method = 'cod'; // Default to COD if invalid
+}
+
 // --- INSERT ITEMS INTO ORDERS ---
 if (!empty($items_to_order)) {
     $insert_stmt = $conn->prepare("
-        INSERT INTO orders (email, product_name, quantity, order_total, status)
-        VALUES (?, ?, ?, ?, 'Pending')
+        INSERT INTO orders (email, product_name, quantity, order_total, payment_method, status)
+        VALUES (?, ?, ?, ?, ?, 'Pending')
     ");
 
     foreach ($items_to_order as $order_item) {
@@ -84,7 +97,7 @@ if (!empty($items_to_order)) {
             $order_total = floatval($row['price']) * $quantity;
 
             // Insert into orders
-            $insert_stmt->bind_param("ssid", $email, $product_name, $quantity, $order_total);
+            $insert_stmt->bind_param("ssids", $email, $product_name, $quantity, $order_total, $payment_method);
             $insert_stmt->execute();
 
             // If from cart, remove from cart table
@@ -107,11 +120,32 @@ if (!empty($items_to_order)) {
 
     $conn->close();
 
+    // Get payment method display name
+    $payment_display = [
+        'cod' => 'Cash on Delivery (COD)',
+        'gcash' => 'GCash',
+        'paymaya' => 'PayMaya',
+        'bank_transfer' => 'Bank Transfer'
+    ];
+    $payment_name = $payment_display[$payment_method] ?? $payment_method;
+
     // Success message
-    echo "<div style='text-align:center; margin-top:50px; font-family:Arial;'>
-            <h2 style='color:green;'>✅ Your order has been placed successfully!</h2>
-            <p><a href='track_order.php' style='color:blue; text-decoration:none; font-weight:bold;'>📦 Track your order</a></p>
-            <p><a href='index.php' style='color:#555; text-decoration:none;'>Continue Shopping</a></p>
+    echo "<div style='text-align:center; margin-top:50px; font-family:Arial; max-width:600px; margin:50px auto; padding:20px; background:#f8f9fa; border-radius:10px; border:1px solid #e9ecef;'>
+            <h2 style='color:green; margin-bottom:20px;'>✅ Order Placed Successfully!</h2>
+            <div style='background:white; padding:15px; border-radius:8px; margin:20px 0; border-left:4px solid #28a745;'>
+                <p style='margin:5px 0; color:#333;'><strong>Payment Method:</strong> {$payment_name}</p>";
+    
+    if ($payment_method === 'cod') {
+        echo "<p style='margin:5px 0; color:#666;'>💰 You will pay when your order arrives</p>";
+    } else {
+        echo "<p style='margin:5px 0; color:#666;'>📱 Please complete your payment and send confirmation</p>";
+    }
+    
+    echo "    </div>
+            <div style='margin-top:20px;'>
+                <p><a href='track_order.php' style='color:white; background:#007bff; padding:10px 20px; text-decoration:none; border-radius:5px; font-weight:bold; display:inline-block; margin:5px;'>📦 Track Your Order</a></p>
+                <p><a href='index.php' style='color:#666; text-decoration:none; font-weight:bold;'>← Continue Shopping</a></p>
+            </div>
           </div>";
     exit;
 }

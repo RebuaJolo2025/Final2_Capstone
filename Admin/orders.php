@@ -230,6 +230,71 @@
       .btn-accept:hover { background: #16a34a; }
       .btn-reject:hover { background: #dc2626; }
       .btn-ship:hover { background: #2563eb; }
+      
+      /* Rider Link Styles */
+      .rider-link-container {
+        min-width: 300px;
+      }
+      
+      .link-display {
+        margin-bottom: 0.5rem;
+      }
+      
+      .link-input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-family: monospace;
+        background: #f9fafb;
+        color: #374151;
+        cursor: pointer;
+      }
+      
+      .link-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+      }
+      
+      .link-actions {
+        display: flex;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+      }
+      
+      .btn-copy {
+        background: #10b981;
+        color: white;
+      }
+      
+      .btn-copy:hover {
+        background: #059669;
+      }
+      
+      .btn-copy.copied {
+        background: #22c55e;
+      }
+      
+      .btn-open {
+        background: #f59e0b;
+        color: white;
+        text-decoration: none;
+      }
+      
+      .btn-open:hover {
+        background: #d97706;
+      }
+      
+      .btn-share {
+        background: #6366f1;
+        color: white;
+      }
+      
+      .btn-share:hover {
+        background: #4f46e5;
+      }
   </style>
   </head>
   <body>
@@ -237,7 +302,7 @@
     <header>
       <h1>📦 Order Management</h1>
       <div>
-        <button class="btn" onclick="location.href='/Caps/Admin/index.html'">← Dashboard</button>
+        <button class="btn" onclick="location.href='/Caps/Admin/index.php'">← Dashboard</button>
         <button class="btn" onclick="location.href='riders.php'">🏍️ Riders</button>
         <button class="btn" onclick="location.href='waybill.php'">Way Bills</button>
       </div>
@@ -333,9 +398,18 @@
                     // Generate rider confirmation link
                     $rider_token = md5($order['id'] . 'delivery_secret_key_2024');
                     $rider_link = '/Caps/rider_confirm.php?order=' . $order['id'] . '&token=' . $rider_token;
+                    $full_link = 'http://' . $_SERVER['HTTP_HOST'] . $rider_link;
                   ?>
-                  <button onclick="copyRiderLink('<?= $rider_link ?>')" class="btn-action" style="background: #10b981; color: white; margin-right: 4px;">📋 Copy</button>
-                  <a href="<?= $rider_link ?>" target="_blank" class="btn-action" style="background: #f59e0b; color: white; text-decoration: none;">📱 Open</a>
+                  <div class="rider-link-container">
+                    <div class="link-display">
+                      <input type="text" value="<?= $full_link ?>" readonly class="link-input" id="link-<?= $order['id'] ?>">
+                    </div>
+                    <div class="link-actions">
+                      <button onclick="copyRiderLink('<?= $order['id'] ?>', '<?= $full_link ?>')" class="btn-action btn-copy" id="copy-btn-<?= $order['id'] ?>">📋 Copy Link</button>
+                      <a href="<?= $rider_link ?>" target="_blank" class="btn-action btn-open">📱 Open</a>
+                      <button onclick="shareLink('<?= $full_link ?>')" class="btn-action btn-share">📤 Share</button>
+                    </div>
+                  </div>
                 <?php else: ?>
                   <span style="color:#9ca3af;">—</span>
                 <?php endif; ?>
@@ -350,24 +424,114 @@
     </div>
   
   <script>
-    function copyRiderLink(link) {
-        const fullLink = window.location.origin + link;
-        navigator.clipboard.writeText(fullLink).then(function() {
-            // Show success message
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✅ Copied!';
-            btn.style.background = '#22c55e';
-            
-            setTimeout(function() {
-                btn.innerHTML = originalText;
-                btn.style.background = '#10b981';
-            }, 2000);
-        }).catch(function() {
+    // Copy rider link function
+    function copyRiderLink(orderId, fullLink) {
+        const linkInput = document.getElementById('link-' + orderId);
+        const copyBtn = document.getElementById('copy-btn-' + orderId);
+        
+        // Select the input text
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999); // For mobile devices
+        
+        // Try modern clipboard API first
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(fullLink).then(function() {
+                showCopySuccess(copyBtn);
+            }).catch(function() {
+                // Fallback to execCommand
+                fallbackCopy(linkInput, copyBtn);
+            });
+        } else {
             // Fallback for older browsers
-            prompt('Copy this rider link:', fullLink);
-        });
+            fallbackCopy(linkInput, copyBtn);
+        }
     }
+    
+    // Fallback copy method
+    function fallbackCopy(linkInput, copyBtn) {
+        try {
+            document.execCommand('copy');
+            showCopySuccess(copyBtn);
+        } catch (err) {
+            // Last resort - show prompt
+            prompt('Copy this rider link:', linkInput.value);
+        }
+    }
+    
+    // Show copy success feedback
+    function showCopySuccess(btn) {
+        const originalText = btn.innerHTML;
+        const originalClass = btn.className;
+        
+        btn.innerHTML = '✅ Copied!';
+        btn.className = originalClass + ' copied';
+        
+        setTimeout(function() {
+            btn.innerHTML = originalText;
+            btn.className = originalClass;
+        }, 2000);
+    }
+    
+    // Share link function
+    function shareLink(link) {
+        if (navigator.share) {
+            // Use native share API if available
+            navigator.share({
+                title: 'Rider Confirmation Link',
+                text: 'Please use this link to confirm delivery:',
+                url: link
+            }).catch(function(err) {
+                console.log('Share failed:', err);
+                fallbackShare(link);
+            });
+        } else {
+            fallbackShare(link);
+        }
+    }
+    
+    // Fallback share method
+    function fallbackShare(link) {
+        const message = encodeURIComponent('Please use this link to confirm delivery: ' + link);
+        
+        // Create share options
+        const shareOptions = [
+            { name: 'WhatsApp', url: 'https://wa.me/?text=' + message },
+            { name: 'Telegram', url: 'https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('Please use this link to confirm delivery:') },
+            { name: 'SMS', url: 'sms:?body=' + message },
+            { name: 'Email', url: 'mailto:?subject=Rider Confirmation Link&body=' + message }
+        ];
+        
+        // Show share options
+        let shareMenu = 'Choose sharing method:\n\n';
+        shareOptions.forEach((option, index) => {
+            shareMenu += (index + 1) + '. ' + option.name + '\n';
+        });
+        
+        const choice = prompt(shareMenu + '\nEnter number (1-4) or press Cancel to copy link:');
+        const choiceNum = parseInt(choice);
+        
+        if (choiceNum >= 1 && choiceNum <= 4) {
+            window.open(shareOptions[choiceNum - 1].url, '_blank');
+        } else if (choice !== null) {
+            // Copy to clipboard as fallback
+            navigator.clipboard.writeText(link).then(function() {
+                alert('Link copied to clipboard!');
+            }).catch(function() {
+                prompt('Copy this link:', link);
+            });
+        }
+    }
+    
+    // Auto-select link when clicked
+    document.addEventListener('DOMContentLoaded', function() {
+        const linkInputs = document.querySelectorAll('.link-input');
+        linkInputs.forEach(function(input) {
+            input.addEventListener('click', function() {
+                this.select();
+                this.setSelectionRange(0, 99999);
+            });
+        });
+    });
   </script>
   </body>
   </html>

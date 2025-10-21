@@ -28,8 +28,17 @@ if ($result && $result->num_rows > 0) {
         $images = json_decode($row['images'], true) ?? [];
         $tags = json_decode($row['tags'], true) ?? [];
 
-   
-        $mainImage = $images[0]['url'] ?? 'assets/placeholder.png';
+        // Handle different image formats (direct paths or object with url)
+        $mainImage = 'uploads/placeholder.png'; // Default
+        if (!empty($images)) {
+            if (is_array($images[0])) {
+                // If images are objects with url property
+                $mainImage = $images[0]['url'] ?? 'uploads/placeholder.png';
+            } else {
+                // If images are direct file paths
+                $mainImage = $images[0];
+            }
+        }
 
        
         $sold = intval($row['sold'] ?? 0);

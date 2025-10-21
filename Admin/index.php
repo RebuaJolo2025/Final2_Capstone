@@ -197,12 +197,7 @@ function formatPercentage($value) {
                         <li><a href="#dashboard" class="nav-link active" data-page="dashboard">
                             <i data-lucide="home"></i><span>Dashboard</span>
                         </a></li>
-                        <li><a href="#revenue" class="nav-link" data-page="revenue">
-                            <i data-lucide="trending-up"></i><span>Revenue Analytics</span>
-                        </a></li>
-                        <li><a href="/Caps/Admin/sales.html" class="nav-link">
-                            <i data-lucide="bar-chart-3"></i><span>Sales Analytics</span>
-                        </a></li>
+                        
                         <li>
                             <a href="/Caps/Admin/Product/product.html" class="nav-link">
                                 <i data-lucide="package"></i><span>Products</span>

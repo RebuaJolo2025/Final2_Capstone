@@ -1,265 +1,156 @@
 <?php
 // ---------- BACKEND (PHP) ----------
-include 'conn.php';
+// Prevent any output before JSON
+ob_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response = ['success' => false, 'message' => 'Error occurred'];
+// Set content type to JSON
+header('Content-Type: application/json');
 
-    $name = $_POST['name'] ?? '';
-    $description = $_POST['description'] ?? '';
-    $category = $_POST['category'] ?? '';
-    $price = $_POST['price'] ?? 0;
-    $stock = $_POST['stock'] ?? 0;
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output
 
-    $uploadedFiles = [];
-    $uploadDir = 'uploads/products/';
-    if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+// Include database connection (Admin version)
+include '../conn.php';
 
-    if (isset($_FILES['images'])) {
-        foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
-            $filename = uniqid('img_') . '.' . pathinfo($_FILES['images']['name'][$key], PATHINFO_EXTENSION);
-            $filepath = $uploadDir . $filename;
-            if (move_uploaded_file($tmpName, $filepath)) {
-                $uploadedFiles[] = $filepath;
+// Check if connection exists
+if (!isset($conn) || $conn->connect_error) {
+    echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . ($conn->connect_error ?? 'Connection not established')]);
+    exit;
+}
+
+try {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $response = ['success' => false, 'message' => 'Error occurred'];
+
+        // Get all form data
+        $name = $_POST['name'] ?? '';
+        $description = $_POST['description'] ?? '';
+        $category = $_POST['category'] ?? '';
+        $price = floatval($_POST['price'] ?? 0);
+        $comparePrice = floatval($_POST['comparePrice'] ?? 0);
+        $stock = intval($_POST['stock'] ?? 0);
+        $sku = $_POST['sku'] ?? '';
+        $weight = floatval($_POST['weight'] ?? 0);
+        $length = floatval($_POST['length'] ?? 0);
+        $width = floatval($_POST['width'] ?? 0);
+        $height = floatval($_POST['height'] ?? 0);
+        $status = $_POST['status'] ?? 'active';
+        $tags = $_POST['tags'] ?? '[]';
+
+        // Validate required fields
+        if (empty($name)) {
+            $response['message'] = 'Product name is required';
+            echo json_encode($response);
+            exit;
+        }
+
+        if (empty($category)) {
+            $response['message'] = 'Category is required';
+            echo json_encode($response);
+            exit;
+        }
+
+        if ($price <= 0) {
+            $response['message'] = 'Price must be greater than 0';
+            echo json_encode($response);
+            exit;
+        }
+
+        // Handle image uploads
+        $uploadedFiles = [];
+        $uploadDir = 'uploads/products/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        if (isset($_FILES['images']) && !empty($_FILES['images']['tmp_name'][0])) {
+            foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
+                if (!empty($tmpName)) {
+                    $originalName = $_FILES['images']['name'][$key];
+                    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $filename = uniqid('product_') . '.' . $extension;
+                    $filepath = $uploadDir . $filename;
+                    
+                    if (move_uploaded_file($tmpName, $filepath)) {
+                        $uploadedFiles[] = $filepath;
+                    }
+                }
             }
         }
-    }
 
-    $imagesJson = json_encode($uploadedFiles);
+        $imagesJson = json_encode($uploadedFiles);
 
-    $stmt = $conn->prepare("INSERT INTO products (name, description, category, price, stock, images) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssdis", $name, $description, $category, $price, $stock, $imagesJson);
+        // Generate SKU if not provided
+        if (empty($sku)) {
+            $sku = 'SKU-' . time() . '-' . strtoupper(substr(md5($name), 0, 4));
+        }
 
-    if ($stmt->execute()) {
-        $response = ['success' => true, 'message' => 'Product added successfully!'];
+        // Create products table if it doesn't exist
+        $createTableQuery = "CREATE TABLE IF NOT EXISTS products (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            category VARCHAR(100) NOT NULL,
+            price DECIMAL(10,2) NOT NULL,
+            compare_price DECIMAL(10,2) DEFAULT 0,
+            stock INT NOT NULL DEFAULT 0,
+            sku VARCHAR(100) UNIQUE,
+            weight DECIMAL(8,2) DEFAULT 0,
+            length DECIMAL(8,2) DEFAULT 0,
+            width DECIMAL(8,2) DEFAULT 0,
+            height DECIMAL(8,2) DEFAULT 0,
+            status ENUM('active', 'draft', 'inactive') DEFAULT 'active',
+            tags JSON,
+            images JSON,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )";
+        
+        $conn->query($createTableQuery);
+
+        // Insert product
+        $stmt = $conn->prepare("INSERT INTO products (name, description, category, price, compare_price, stock, sku, weight, length, width, height, status, tags, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        if (!$stmt) {
+            ob_clean();
+            echo json_encode(['success' => false, 'message' => 'Database prepare error: ' . $conn->error]);
+            exit;
+        }
+
+        // Fixed parameter types: s=string, d=double, i=integer
+        // name(s), description(s), category(s), price(d), compare_price(d), stock(i), sku(s), weight(d), length(d), width(d), height(d), status(s), tags(s), images(s)
+        $stmt->bind_param("sssddisd dddsss", 
+            $name, $description, $category, $price, $comparePrice, $stock, $sku, 
+            $weight, $length, $width, $height, $status, $tags, $imagesJson
+        );
+
+        if ($stmt->execute()) {
+            $productId = $conn->insert_id;
+            $response = [
+                'success' => true, 
+                'message' => 'Product saved successfully!',
+                'product_id' => $productId
+            ];
+        } else {
+            $response['message'] = 'Database error: ' . $stmt->error;
+        }
+
+        $stmt->close();
+        
+        // Clean output buffer and send JSON
+        ob_clean();
+        echo json_encode($response);
+        exit;
     } else {
-        $response['message'] = 'Database error: ' . $stmt->error;
+        // Not a POST request
+        ob_clean();
+        echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        exit;
     }
-
-    echo json_encode($response);
+} catch (Exception $e) {
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
     exit;
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add Product</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: #f4f6f8;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
-
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    .image-upload {
-      border: 2px dashed #ccc;
-      padding: 2rem;
-      border-radius: 10px;
-      text-align: center;
-      transition: border-color 0.3s;
-      cursor: pointer;
-    }
-
-    .image-upload:hover {
-      border-color: #3498db;
-    }
-
-    .image-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .image-preview img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-    }
-
-    .btn {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .btn:hover {
-      background: #2980b9;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #333;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 6px;
-      opacity: 0;
-      transition: opacity 0.4s ease-in-out;
-    }
-
-    .toast.show {
-      opacity: 1;
-    }
-  </style>
-</head>
-
-<body>
-  <header>
-    <h1>Add New Product</h1>
-  </header>
-
-  <div class="container">
-    <form id="productForm" enctype="multipart/form-data">
-      <div class="form-group">
-        <label>Product Name</label>
-        <input type="text" name="name" required />
-      </div>
-
-      <div class="form-group">
-        <label>Description</label>
-        <textarea name="description" rows="4"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>Category</label>
-        <select name="category" required>
-          <option value="">Select category</option>
-          <option value="fashion">Fashion</option>
-          <option value="electronics">Electronics</option>
-          <option value="beauty">Beauty</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Price (₱)</label>
-        <input type="number" name="price" step="0.01" required />
-      </div>
-
-      <div class="form-group">
-        <label>Stock Quantity</label>
-        <input type="number" name="stock" min="0" required />
-      </div>
-
-      <div class="form-group">
-        <label>Upload Product Images</label>
-        <div class="image-upload" onclick="document.getElementById('imageUpload').click()">
-          <input type="file" id="imageUpload" name="images[]" multiple accept="image/*" hidden />
-          <p><i class="fa fa-cloud-upload-alt"></i> Click or Drag to Upload</p>
-        </div>
-        <div class="image-preview" id="imagePreview"></div>
-      </div>
-
-      <button type="submit" class="btn">Save Product</button>
-    </form>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-  <script>
-    const form = document.getElementById('productForm');
-    const imageUpload = document.getElementById('imageUpload');
-    const imagePreview = document.getElementById('imagePreview');
-    const toast = document.getElementById('toast');
-    let images = [];
-
-    imageUpload.addEventListener('change', (e) => {
-      const files = Array.from(e.target.files);
-      imagePreview.innerHTML = '';
-      images = files;
-
-      files.forEach(file => {
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const img = document.createElement('img');
-            img.src = event.target.result;
-            imagePreview.appendChild(img);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      images.forEach((file) => formData.append('images[]', file));
-
-      const response = await fetch(window.location.href, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-      showToast(result.message);
-
-      if (result.success) {
-        form.reset();
-        imagePreview.innerHTML = '';
-      }
-    });
-
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-  </script>
-</body>
-</html>
