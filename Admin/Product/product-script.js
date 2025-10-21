@@ -13,6 +13,12 @@ const addProductBtn = document.getElementById('addProductBtn');
 const closeModalBtn = document.getElementById('closeModal');
 const cancelBtn = document.getElementById('cancelBtn');
 const productForm = document.getElementById('productForm');
+const productIdInput = document.getElementById('productId');
+const productNameInput = document.getElementById('productName');
+const productPriceInput = document.getElementById('productPrice');
+const productStockInput = document.getElementById('productStock');
+const productCategorySelect = document.getElementById('productCategory');
+const productDescriptionTextarea = document.getElementById('productDescription');
 
 // Toast
 const toast = document.getElementById('toast');
@@ -26,6 +32,7 @@ const totalSoldEl = document.getElementById('totalSold');
 
 // Filter state
 let products = [];
+let isEditing = false;
 let currentFilters = { search: '', category: 'all', status: 'all' };
 
 // Fetch products from database
@@ -61,10 +68,10 @@ function setupEventListeners() {
     statusFilter.addEventListener('change', handleStatusFilter);
     clearFiltersBtn.addEventListener('click', clearFilters);
 
-    addProductBtn.addEventListener('click', openModal);
+    addProductBtn.addEventListener('click', (e) => { e.preventDefault(); startAdd(); });
     closeModalBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
-    productForm.addEventListener('submit', handleAddProduct);
+    productForm.addEventListener('submit', handleSubmitProduct);
 
     addProductModal.addEventListener('click', (e) => {
         if (e.target === addProductModal) closeModal();
@@ -164,7 +171,23 @@ function toggleDropdown(id) {
     document.querySelectorAll('.dropdown-menu').forEach(menu => { if (menu !== dropdown) menu.classList.remove('show'); });
     dropdown.classList.toggle('show');
 }
-function editProduct(id) { showToast(`Editing ${products.find(p=>p.id===id).name}`); }
+function editProduct(id) {
+    const p = products.find(prod => prod.id === id);
+    if (!p) return;
+    isEditing = true;
+    productIdInput.value = p.id;
+    productNameInput.value = p.name || '';
+    productPriceInput.value = p.price ?? '';
+    productStockInput.value = p.stock ?? '';
+    productCategorySelect.value = p.category || '';
+    productDescriptionTextarea.value = p.description || '';
+    // Change header and button text if present
+    const header = addProductModal.querySelector('.modal-header h2');
+    if (header) header.textContent = 'Edit Product';
+    const submitBtn = productForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Update Product';
+    openModal();
+}
 function viewProduct(id) { showToast(`Viewing ${products.find(p=>p.id===id).name}`); }
 function toggleProductStatus(id) {
     const index = products.findIndex(p => p.id === id);
@@ -178,26 +201,45 @@ function toggleProductStatus(id) {
 
 // Modal
 function openModal() { addProductModal.classList.add('show'); document.body.style.overflow = 'hidden'; }
-function closeModal() { addProductModal.classList.remove('show'); document.body.style.overflow = 'auto'; productForm.reset(); }
+function closeModal() {
+    addProductModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+    productForm.reset();
+    productIdInput.value = '';
+    isEditing = false;
+    // Reset header/button text
+    const header = addProductModal.querySelector('.modal-header h2');
+    if (header) header.textContent = 'Add New Product';
+    const submitBtn = productForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Add Product';
+}
 
-// Add product
-async function handleAddProduct(e) {
+function startAdd() {
+    isEditing = false;
+    productIdInput.value = '';
+    openModal();
+}
+
+// Add/Update product
+async function handleSubmitProduct(e) {
     e.preventDefault();
     const formData = new FormData(productForm);
+    const hasId = (formData.get('id') || '').toString().trim() !== '';
 
     try {
-        const response = await fetch('add_product.php', { method: 'POST', body: formData });
+        const url = hasId ? 'update_product.php' : 'save_product.php';
+        const response = await fetch(url, { method: 'POST', body: formData });
         const result = await response.json();
         if (result.success) {
-            showToast('Product added successfully!');
+            showToast(hasId ? 'Product updated successfully!' : 'Product added successfully!');
             fetchProducts();
             closeModal();
         } else {
-            showToast(result.message || 'Failed to add product', 'error');
+            showToast(result.message || (hasId ? 'Failed to update product' : 'Failed to add product'), 'error');
         }
     } catch (error) {
         console.error(error);
-        showToast('Failed to add product', 'error');
+        showToast(hasId ? 'Failed to update product' : 'Failed to add product', 'error');
     }
 }
 

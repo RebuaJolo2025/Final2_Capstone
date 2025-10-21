@@ -119,13 +119,13 @@
     <main class="main-content">
       <header class="dashboard-header">
         <h1>Payments Overview</h1>
-        <p>Track how many customers pay using COD vs Online.</p>
+        <p>Track and monitor all Cash on Delivery (COD) transactions.</p>
       </header>
 
       <!-- Metrics -->
       <div class="metrics-grid">
         <div class="metric-card">
-          <div class="metric-title">Total Payments</div>
+          <div class="metric-title">Total COD Payments</div>
           <div class="metric-value">$98,452</div>
         </div>
         <div class="metric-card">
@@ -133,11 +133,7 @@
           <div class="metric-value" id="codCount">0</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">Online Customers</div>
-          <div class="metric-value" id="onlineCount">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Refunded</div>
+          <div class="metric-title">Refunded COD</div>
           <div class="metric-value">$4,230</div>
         </div>
       </div>
@@ -145,29 +141,23 @@
       <!-- Charts -->
       <div class="charts-grid">
         <div class="chart-card">
-          <h3>COD vs Online Distribution</h3>
-          <canvas id="codVsOnlineChart"></canvas>
-        </div>
-        <div class="chart-card">
-          <h3>Payments Trend</h3>
-          <canvas id="paymentsTrendChart"></canvas>
+          <h3>COD Payments Trend</h3>
+          <canvas id="codPaymentsTrendChart"></canvas>
         </div>
       </div>
 
       <!-- Table -->
       <div class="table-card">
-        <h3>Recent Payments</h3>
+        <h3>Recent COD Payments</h3>
         <table id="paymentsTable">
           <thead>
             <tr>
-              <th>ID</th><th>Customer</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th>
+              <th>ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>#TXN1023</td><td>Jane Doe</td><td>$120.50</td><td class="method">Online</td><td><span class="status success">Completed</span></td><td>2025-09-29</td></tr>
-            <tr><td>#TXN1024</td><td>Mark Smith</td><td>$85.00</td><td class="method">COD</td><td><span class="status pending">Pending</span></td><td>2025-09-30</td></tr>
-            <tr><td>#TXN1025</td><td>Sara Lee</td><td>$200.75</td><td class="method">Online</td><td><span class="status failed">Failed</span></td><td>2025-09-30</td></tr>
-            <tr><td>#TXN1026</td><td>John Carter</td><td>$45.99</td><td class="method">COD</td><td><span class="status success">Completed</span></td><td>2025-09-30</td></tr>
+            <tr><td>#TXN1024</td><td>Mark Smith</td><td>$85.00</td><td><span class="status pending">Pending</span></td><td>2025-09-30</td></tr>
+            <tr><td>#TXN1026</td><td>John Carter</td><td>$45.99</td><td><span class="status success">Completed</span></td><td>2025-09-30</td></tr>
           </tbody>
         </table>
       </div>
@@ -175,40 +165,28 @@
   </div>
 
   <script>
-    // Count COD vs Online
-    let codCount = 0, onlineCount = 0;
-    document.querySelectorAll("#paymentsTable tbody tr").forEach(row => {
-      const method = row.cells[3].innerText.trim();
-      if (method === "COD") codCount++;
-      if (method === "Online") onlineCount++;
-    });
+    // Count COD rows
+    const codCount = document.querySelectorAll("#paymentsTable tbody tr").length;
     document.getElementById("codCount").innerText = codCount;
-    document.getElementById("onlineCount").innerText = onlineCount;
 
-    // COD vs Online Chart
-    new Chart(document.getElementById("codVsOnlineChart"), {
-      type: "doughnut",
-      data: {
-        labels: ["COD", "Online"],
-        datasets: [{
-          data: [codCount, onlineCount],
-          backgroundColor: ["#f97316", "#22c55e"]
-        }]
-      },
-      options: { plugins: { legend: { position: "bottom" } } }
-    });
-
-    // Payments Trend Chart
-    new Chart(document.getElementById("paymentsTrendChart"), {
+    // COD Payments Trend Chart
+    new Chart(document.getElementById("codPaymentsTrendChart"), {
       type: "line",
       data: {
         labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"],
         datasets: [
-          { label:"COD", data:[120,150,180,160,200,230,250,240,260], borderColor:"#f97316", fill:false },
-          { label:"Online", data:[300,320,350,370,400,420,450,480,500], borderColor:"#22c55e", fill:false }
+          { 
+            label:"COD Payments", 
+            data:[120,150,180,160,200,230,250,240,260], 
+            borderColor:"#f97316", 
+            fill:false 
+          }
         ]
       },
-      options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+      options: { 
+        responsive: true, 
+        plugins: { legend: { position: "bottom" } } 
+      }
     });
 
     lucide.createIcons();
