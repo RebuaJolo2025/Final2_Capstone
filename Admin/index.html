@@ -50,41 +50,45 @@
                             <a href="/Caps/Admin/Product/product.html" class="nav-link">
                                 <i data-lucide="package"></i><span>Products</span>
                             </a>
-                        </li>
-                        <li>
-                            <a href="/Caps/Admin/payments.html" class="nav-link">
-                                <i data-lucide="credit-card"></i><span>Payments</span>
-                            </a>
-                        </li>
+                            </li>
+                       <li>
+                           <a href="/Caps/Admin/payments.html" class="nav-link">
+                           <i data-lucide="credit-card"></i><span>Payments</span>
+                     </a>
+                      </li>
                         <li><a href="/Caps/Admin/orders.php" class="nav-link">
                             <i data-lucide="shopping-bag"></i><span>Transactions</span>
                         </a></li>
                     </ul>
                 </div>
 
+
                 <div class="nav-section">
                     <h3 class="nav-section-title">Management</h3>
                     <ul class="nav-list">
+                      
                         <li>
-                            <a href="/Caps/Admin/profiles.html" class="nav-link">
-                                <i data-lucide="users"></i><span>Profile Reports</span>
-                            </a>
-                        </li> 
+                     <a href="/Caps/Admin/profiles.html" class="nav-link">
+                   <i data-lucide="users"></i><span>Profile Reports</span>
+                    </a>
+                   </li> 
                         <li>
-                            <a href="/Caps/Admin/refunds.html" class="nav-link">
-                                <i data-lucide="refresh-cw"></i><span>Refunds</span>
-                            </a>
+                      <a href="/Caps/Admin/refunds.html" class="nav-link">
+                            <i data-lucide="refresh-cw"></i>
+                                  <span>Refunds</span>
+                              </a>
                         </li>
-                        <li>
-                            <a href="/Caps/Admin/delivery.html" class="nav-link">
-                                <i data-lucide="truck"></i><span>Delivery Status</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/Caps/Admin/settings.html" class="nav-link">
-                                <i data-lucide="settings"></i><span>Settings</span>
-                            </a>
-                        </li>
+
+                        <li><a href="/Caps/Admin/delivery.html" class="nav-link"><i data-lucide="truck">
+                         </i><span>Delivery Status</span>
+                        </a></li>
+                       <li>
+                    <a href="/Caps/Admin/settings.html" class="nav-link">
+                        <i data-lucide="settings"></i>
+                        <span>Settings</span>
+                    </a>
+                    </li>
+
                     </ul>
                 </div>
             </nav>
@@ -105,7 +109,11 @@
                 </div>
                 
                 <div class="header-right">
-                    <!-- 🧹 Notification button removed -->
+                    <button class="header-btn notification-btn">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    
                     <div class="user-menu">
                         <button class="user-avatar" id="userMenuToggle">
                             <span>AD</span>
@@ -128,6 +136,7 @@
 
             <!-- Page Content -->
             <div class="page-content">
+                <!-- Dashboard Page -->
                 <div id="dashboard-page" class="page active">
                     <div class="page-header">
                         <h1>Dashboard Overview</h1>
@@ -185,7 +194,7 @@
                         </div>
                     </div>
 
-                    <!-- Charts -->
+                    <!-- Charts Section -->
                     <div class="charts-grid">
                         <div class="chart-card">
                             <div class="chart-header">
@@ -208,7 +217,7 @@
                         </div>
                     </div>
 
-                    <!-- Additional Metrics -->
+                    <!-- Secondary Metrics -->
                     <div class="metrics-grid">
                         <div class="metric-card">
                             <div class="metric-header">
@@ -255,23 +264,29 @@
                         </div>
                     </div>
 
-                    <!-- Tables -->
+                    <!-- Data Tables -->
                     <div class="tables-grid">
                         <div class="table-card">
                             <div class="table-header">
                                 <h3>Top Selling Products</h3>
                             </div>
-                            <div class="table-content" id="topProductsTable"></div>
+                            <div class="table-content" id="topProductsTable">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
                         </div>
 
                         <div class="table-card">
                             <div class="table-header">
                                 <h3>Recent Transactions</h3>
                             </div>
-                            <div class="table-content" id="recentTransactionsTable"></div>
+                            <div class="table-content" id="recentTransactionsTable">
+                                <!-- Content will be populated by JavaScript -->
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Add more pages as needed -->
             </div>
         </main>
     </div>

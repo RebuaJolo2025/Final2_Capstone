@@ -24,14 +24,14 @@ $products = [];
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        // Decode JSON fields
+       
         $images = json_decode($row['images'], true) ?? [];
         $tags = json_decode($row['tags'], true) ?? [];
 
-        // Use first image as main image for grid display
+   
         $mainImage = $images[0]['url'] ?? 'assets/placeholder.png';
 
-        // Example: total sold (optional, default 0)
+       
         $sold = intval($row['sold'] ?? 0);
 
         $products[] = [
@@ -61,6 +61,6 @@ if ($result && $result->num_rows > 0) {
 
 $conn->close();
 
-// Return JSON
+
 echo json_encode($products);
 ?>
