@@ -1,24 +1,13 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Management - Seller Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management - Seller Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-<<<<<<< HEAD
-  <header class="header">
-    <div class="container">
-      <a href="../index.php" class="system-back-btn">
-        <i class="fas fa-arrow-left"></i> Back
-      </a>
-      <div class="header-content">
-        <div class="header-text">
-          <h1>Product Management</h1>
-          <p>Manage your product inventory and listings</p>
-=======
     <!-- Header -->
     <header class="header">
         <div class="container">
@@ -185,187 +174,17 @@
                     <button type="submit" class="btn btn-primary">Add Product</button>
                 </div>
             </form>
->>>>>>> 638bf3ceece9d667ac70cb2b193baa775422d4d1
         </div>
-        <button id="addProductBtn" class="btn btn-primary">
-          <i class="fas fa-plus"></i> Add Product
-        </button>
-      </div>
     </div>
-  </header>
+   
 
-  <main class="main">
-    <div class="container">
-      <div id="productsGrid" class="products-grid"></div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Product added successfully!</span>
     </div>
-  </main>
 
-  <!-- Add/Edit Product Modal -->
-  <div id="addProductModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">Add Product</h2>
-        <button class="modal-close" id="closeModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <form id="productForm" enctype="multipart/form-data">
-        <input type="hidden" id="productId">
-
-        <div class="form-group">
-          <label for="productName">Product Name</label>
-          <input type="text" id="productName" required>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="productPrice">Price (₱)</label>
-            <input type="number" id="productPrice" step="0.01" required>
-          </div>
-          <div class="form-group">
-            <label for="productStock">Stock</label>
-            <input type="number" id="productStock" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="productCategory">Category</label>
-          <select id="productCategory" required>
-            <option value="">Select category</option>
-            <option>Electronics</option>
-            <option>Fashion</option>
-            <option>Home & Living</option>
-            <option>Beauty & Health</option>
-            <option>Sports & Outdoors</option>
-            <option>Books & Media</option>
-            <option>Automotive</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="productDescription">Description</label>
-          <textarea id="productDescription" rows="3"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Product Image</label>
-          <input type="file" id="productImage" accept="image/*">
-          <img id="previewImage" src="" style="width:100%;margin-top:10px;display:none;border-radius:10px;">
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    const modal = document.getElementById('addProductModal');
-    const addBtn = document.getElementById('addProductBtn');
-    const closeModal = document.getElementById('closeModal');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const form = document.getElementById('productForm');
-    const productsGrid = document.getElementById('productsGrid');
-    const previewImage = document.getElementById('previewImage');
-    const modalTitle = document.getElementById('modalTitle');
-
-    let products = JSON.parse(localStorage.getItem('products')) || [];
-    let editIndex = null;
-
-    function openModal(edit = false) {
-      modal.style.display = 'flex';
-      modalTitle.textContent = edit ? 'Edit Product' : 'Add Product';
-    }
-
-    function closeModalFunc() {
-      modal.style.display = 'none';
-      form.reset();
-      previewImage.style.display = 'none';
-      editIndex = null;
-    }
-
-    addBtn.onclick = () => openModal();
-    closeModal.onclick = cancelBtn.onclick = () => closeModalFunc();
-
-    document.getElementById('productImage').addEventListener('change', function() {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          previewImage.src = e.target.result;
-          previewImage.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      const data = {
-        name: productName.value,
-        price: parseFloat(productPrice.value),
-        stock: parseInt(productStock.value),
-        category: productCategory.value,
-        description: productDescription.value,
-        image: previewImage.src || ''
-      };
-
-      if (editIndex !== null) {
-        products[editIndex] = data;
-      } else {
-        products.push(data);
-      }
-
-      localStorage.setItem('products', JSON.stringify(products));
-      renderProducts();
-      closeModalFunc();
-    };
-
-    function renderProducts() {
-      productsGrid.innerHTML = '';
-      if (products.length === 0) {
-        productsGrid.innerHTML = `<p style="text-align:center;">No products yet.</p>`;
-        return;
-      }
-
-      products.forEach((p, i) => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <img src="${p.image || 'https://via.placeholder.com/200'}" alt="${p.name}">
-          <h3>${p.name}</h3>
-          <p>₱${p.price}</p>
-          <p>Stock: ${p.stock}</p>
-          <p>${p.category}</p>
-          <div class="product-actions">
-            <button class="btn btn-outline" onclick="editProduct(${i})"><i class="fas fa-edit"></i> Edit</button>
-          </div>
-        `;
-        productsGrid.appendChild(card);
-      });
-    }
-
-    window.editProduct = (i) => {
-      const p = products[i];
-      editIndex = i;
-      openModal(true);
-
-      document.getElementById('productName').value = p.name;
-      document.getElementById('productPrice').value = p.price;
-      document.getElementById('productStock').value = p.stock;
-      document.getElementById('productCategory').value = p.category;
-      document.getElementById('productDescription').value = p.description;
-
-      if (p.image) {
-        previewImage.src = p.image;
-        previewImage.style.display = 'block';
-      }
-    };
-
-    renderProducts();
-  </script>
+    <script src="product-script.js"></script>
 </body>
 </html>
