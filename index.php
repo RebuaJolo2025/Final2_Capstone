@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* RESET */
+   
     * {
       margin: 0;
       padding: 0;
@@ -20,7 +20,7 @@
       color: #333;
     }
 
-    /* HEADER */
+    
     header {
       display: flex;
       align-items: center;
@@ -80,7 +80,7 @@
       border: 2px solid #fffbf1ff;
     }
 
-    /* HERO SECTION */
+    
     .hero-section {
       background: linear-gradient(rgba(30, 30, 47, 0.6), rgba(30, 30, 47, 0.6)), url('./img/ifx_bg.jpg');
       background-size: cover;
@@ -101,7 +101,7 @@
       opacity: 0.9;
     }
 
-    /* PRODUCTS */
+   
     .product-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -161,7 +161,7 @@
       color: #1e1e2f;
     }
 
-    /* RESPONSIVE */
+
     @media (max-width: 768px) {
       header {
         flex-direction: column;
