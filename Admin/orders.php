@@ -9,6 +9,28 @@
       switch ($_POST['action']) {
           case 'accept': $action = 'processing'; break;
           case 'reject': $action = 'rejected'; break;
+          case 'assign_rider':
+              $riderId = (int)$_POST['rider_id'];
+              if ($riderId > 0) {
+                  // Get rider name
+                  $riderStmt = $conn->prepare("SELECT name FROM riders WHERE id = ? AND status = 'active'");
+                  $riderStmt->bind_param("i", $riderId);
+                  $riderStmt->execute();
+                  $riderResult = $riderStmt->get_result();
+                  
+                  if ($riderResult->num_rows > 0) {
+                      $rider = $riderResult->fetch_assoc();
+                      $assignedAt = date('Y-m-d H:i:s');
+                      
+                      // Update order with rider assignment and mark as shipped
+                      $updateStmt = $conn->prepare("UPDATE orders SET status='shipped', rider_id=?, rider_name=?, assigned_at=? WHERE id=?");
+                      $updateStmt->bind_param("issi", $riderId, $rider['name'], $assignedAt, $orderId);
+                      $updateStmt->execute();
+                      $updateStmt->close();
+                  }
+                  $riderStmt->close();
+              }
+              break;
           case 'shipped': $action = 'shipped'; break;
       }
       if ($action) {
@@ -21,29 +43,65 @@
       exit;
   }
 
-  // Fetch orders
-  $sql = "
-  SELECT o.id, u.fullname AS customer_name, o.product_name, o.quantity, o.order_total, o.status, o.rating, o.order_date
-  FROM orders o
-  LEFT JOIN (SELECT DISTINCT email, fullname FROM userdata) u
-  ON o.email = u.email
-  ORDER BY o.order_date DESC, o.product_name ASC
-  ";
-  $result = $conn->query($sql);
+  // Status filter
+  $filter = isset($_GET['status']) ? strtolower(trim($_GET['status'])) : '';
+  $allowed = ['pending','processing','shipped','rejected','delivered'];
+  if (!in_array($filter, $allowed)) { $filter = ''; }
 
-  $orders = [];
-  $pendingCount = $processingCount = $shippedCount = $rejectedCount = 0;
-  if ($result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-          $orders[] = $row;
-          switch (strtolower($row['status'])) {
-              case 'pending': $pendingCount++; break;
-              case 'processing': $processingCount++; break;
-              case 'shipped': $shippedCount++; break;
-              case 'rejected': $rejectedCount++; break;
+  // Metric counts across all orders
+  $pendingCount = $processingCount = $shippedCount = $rejectedCount = $deliveredCount = 0;
+  $countSql = "SELECT LOWER(status) s, COUNT(*) c FROM orders GROUP BY s";
+  if ($countRes = $conn->query($countSql)) {
+      while ($r = $countRes->fetch_assoc()) {
+          switch ($r['s']) {
+              case 'pending': $pendingCount = (int)$r['c']; break;
+              case 'processing': $processingCount = (int)$r['c']; break;
+              case 'shipped': $shippedCount = (int)$r['c']; break;
+              case 'rejected': $rejectedCount = (int)$r['c']; break;
+              case 'delivered': $deliveredCount = (int)$r['c']; break;
           }
       }
+      $countRes->close();
   }
+
+  // Fetch active riders for assignment dropdown
+  $riders = [];
+  $riderResult = $conn->query("SELECT id, name FROM riders WHERE status = 'active' ORDER BY name ASC");
+  if ($riderResult && $riderResult->num_rows > 0) {
+      while ($row = $riderResult->fetch_assoc()) {
+          $riders[] = $row;
+      }
+  }
+
+  // Fetch orders (optionally filtered)
+  $orders = [];
+  $baseSql = "
+  SELECT o.id, o.email, u.fullname AS customer_name, o.product_name, o.quantity, o.order_total, o.status, o.rating, o.order_date, o.rider_id, o.rider_name
+  FROM orders o
+  LEFT JOIN (SELECT DISTINCT email, fullname FROM userdata) u
+  ON o.email = u.email";
+
+  if ($filter) {
+      $baseSql .= " WHERE LOWER(o.status) = ?";
+  }
+  $baseSql .= " ORDER BY o.order_date DESC, o.product_name ASC";
+
+  if ($filter) {
+      $stmt = $conn->prepare($baseSql);
+      $stmt->bind_param("s", $filter);
+      $stmt->execute();
+      $result = $stmt->get_result();
+  } else {
+      $result = $conn->query($baseSql);
+  }
+
+  if ($result && $result->num_rows > 0) {
+      while ($row = $result->fetch_assoc()) {
+          $orders[] = $row;
+      }
+  }
+  if (isset($stmt) && $stmt) { $stmt->close(); }
+  if ($result instanceof mysqli_result) { $result->close(); }
   ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -113,6 +171,8 @@
         font-size: 1.6rem;
       }
       .metric p { margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--muted); }
+      .metric-link { display: block; text-decoration: none; color: inherit; border: 1px solid transparent; border-radius: 12px; }
+      .metric-link.active { border-color: #c7d2fe; box-shadow: 0 0 0 3px rgba(79,70,229,0.15); }
 
       /* Orders Table */
       .table-container {
@@ -151,6 +211,7 @@
       .status-processing { background: #dbeafe; color: #1e40af; }
       .status-shipped { background: #dcfce7; color: #166534; }
       .status-rejected { background: #fee2e2; color: #991b1b; }
+      .status-delivered { background: #d1fae5; color: #065f46; }
 
       /* Action Buttons */
       .btn-action {
@@ -177,17 +238,27 @@
       <h1>📦 Order Management</h1>
       <div>
         <button class="btn" onclick="location.href='/Caps/Admin/index.html'">← Dashboard</button>
+        <button class="btn" onclick="location.href='riders.php'">🏍️ Riders</button>
         <button class="btn" onclick="location.href='waybill.php'">Way Bills</button>
       </div>
     </header>
 
     <!-- METRICS -->
     <div class="metrics">
-      <div class="metric"><h2><?= $pendingCount ?></h2><p>Pending Orders</p></div>
-      <div class="metric"><h2><?= $processingCount ?></h2><p>Processing</p></div>
-      <div class="metric"><h2><?= $shippedCount ?></h2><p>Shipped</p></div>
-      <div class="metric"><h2><?= $rejectedCount ?></h2><p>Rejected</p></div>
+      <a class="metric metric-link <?= $filter==='pending' ? 'active' : '' ?>" href="?status=pending"><h2><?= $pendingCount ?></h2><p>Pending</p></a>
+      <a class="metric metric-link <?= $filter==='processing' ? 'active' : '' ?>" href="?status=processing"><h2><?= $processingCount ?></h2><p>Processing</p></a>
+      <a class="metric metric-link <?= $filter==='shipped' ? 'active' : '' ?>" href="?status=shipped"><h2><?= $shippedCount ?></h2><p>Shipped</p></a>
+      <a class="metric metric-link <?= $filter==='delivered' ? 'active' : '' ?>" href="?status=delivered"><h2><?= $deliveredCount ?></h2><p>Delivered</p></a>
+      <a class="metric metric-link <?= $filter==='rejected' ? 'active' : '' ?>" href="?status=rejected"><h2><?= $rejectedCount ?></h2><p>Rejected</p></a>
     </div>
+    <?php if ($filter): ?>
+    <div class="table-container" style="margin-top:0.5rem;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div><strong>Filter:</strong> <?= ucfirst($filter) ?></div>
+        <a href="<?= htmlspecialchars(strtok($_SERVER['REQUEST_URI'], '?')) ?>" style="text-decoration:none; color:#2563eb;">Clear</a>
+      </div>
+    </div>
+    <?php endif; ?>
 
     <!-- TABLE -->
     <div class="table-container">
@@ -200,6 +271,7 @@
             <th>Qty</th>
             <th>Total</th>
             <th>Status</th>
+            <th>Rider</th>
             <th>Rating</th>
             <th>Date</th>
             <th>Actions</th>
@@ -215,6 +287,13 @@
               <td><?= $order['quantity'] ?></td>
               <td>₱<?= number_format($order['order_total'],2) ?></td>
               <td><span class="status-badge status-<?= strtolower($order['status']) ?>"><?= ucfirst($order['status']) ?></span></td>
+              <td>
+                <?php if ($order['rider_name']): ?>
+                  <span style="color: #059669; font-weight: 600;"><?= htmlspecialchars($order['rider_name']) ?></span>
+                <?php else: ?>
+                  <span style="color: #9ca3af;">—</span>
+                <?php endif; ?>
+              </td>
               <td>
                 <?php if($order['rating']): ?>
                   <?php
@@ -237,10 +316,26 @@
                     <button type="submit" name="action" value="reject" class="btn-action btn-reject">Reject</button>
                   </form>
                 <?php elseif(strtolower($order['status']) === 'processing'): ?>
-                  <form method="POST" style="display:inline-block;">
-                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                    <button type="submit" name="action" value="shipped" class="btn-action btn-ship">Shipped</button>
-                  </form>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <form method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
+                      <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                      <select name="rider_id" required style="padding: 0.4rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.8rem;">
+                        <option value="">Select Rider</option>
+                        <?php foreach ($riders as $rider): ?>
+                          <option value="<?= $rider['id'] ?>"><?= htmlspecialchars($rider['name']) ?></option>
+                        <?php endforeach; ?>
+                      </select>
+                      <button type="submit" name="action" value="assign_rider" class="btn-action btn-ship">Assign & Ship</button>
+                    </form>
+                  </div>
+                <?php elseif(strtolower($order['status']) === 'shipped'): ?>
+                  <?php 
+                    // Generate rider confirmation link
+                    $rider_token = md5($order['id'] . 'delivery_secret_key_2024');
+                    $rider_link = '/Caps/rider_confirm.php?order=' . $order['id'] . '&token=' . $rider_token;
+                  ?>
+                  <button onclick="copyRiderLink('<?= $rider_link ?>')" class="btn-action" style="background: #10b981; color: white; margin-right: 4px;">📋 Copy</button>
+                  <a href="<?= $rider_link ?>" target="_blank" class="btn-action" style="background: #f59e0b; color: white; text-decoration: none;">📱 Open</a>
                 <?php else: ?>
                   <span style="color:#9ca3af;">—</span>
                 <?php endif; ?>
@@ -248,10 +343,31 @@
             </tr>
             <?php endforeach; ?>
           <?php else: ?>
-            <tr><td colspan="9" style="text-align:center; color:#9ca3af;">No orders found</td></tr>
+            <tr><td colspan="10" style="text-align:center; color:#9ca3af;">No orders found</td></tr>
           <?php endif; ?>
         </tbody>
       </table>
     </div>
+  
+  <script>
+    function copyRiderLink(link) {
+        const fullLink = window.location.origin + link;
+        navigator.clipboard.writeText(fullLink).then(function() {
+            // Show success message
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            btn.style.background = '#22c55e';
+            
+            setTimeout(function() {
+                btn.innerHTML = originalText;
+                btn.style.background = '#10b981';
+            }, 2000);
+        }).catch(function() {
+            // Fallback for older browsers
+            prompt('Copy this rider link:', fullLink);
+        });
+    }
+  </script>
   </body>
   </html>

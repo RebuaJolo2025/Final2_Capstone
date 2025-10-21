@@ -67,9 +67,16 @@ if (!empty($items_to_order)) {
         $id = $order_item['id'];
         $quantity = $order_item['quantity'];
 
-        // Get product info
-        $stmt = $conn->prepare("SELECT name, price FROM products WHERE id = ?");
-        $stmt->bind_param("i", $id);
+        if ($order_item['is_buy_now']) {
+            // Buy Now: $id is a product ID
+            $stmt = $conn->prepare("SELECT name, price FROM products WHERE id = ?");
+            $stmt->bind_param("i", $id);
+        } else {
+            // From cart: $id is a cart row ID; resolve via cart -> products for this user
+            $stmt = $conn->prepare("SELECT p.name AS name, p.price AS price FROM cart c JOIN products p ON p.id = c.product_id WHERE c.id = ? AND c.email = ?");
+            $stmt->bind_param("is", $id, $email);
+        }
+
         $stmt->execute();
         $result = $stmt->get_result();
         if ($row = $result->fetch_assoc()) {
