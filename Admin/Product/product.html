@@ -124,25 +124,26 @@
                 </button>
             </div>
             <form id="productForm" class="product-form">
+                <input type="hidden" id="productId" name="id">
                 <div class="form-group">
                     <label for="productName">Product Name *</label>
-                    <input type="text" id="productName" required>
+                    <input type="text" id="productName" name="name" required>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="productPrice">Price (₱) *</label>
-                        <input type="number" id="productPrice" step="0.01" required>
+                        <input type="number" id="productPrice" name="price" step="0.01" required>
                     </div>
                     <div class="form-group">
                         <label for="productStock">Stock Quantity *</label>
-                        <input type="number" id="productStock" required>
+                        <input type="number" id="productStock" name="stock" required>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="productCategory">Category *</label>
-                    <select id="productCategory" required>
+                    <select id="productCategory" name="category" required>
                         <option value="">Select a category</option>
                         <option value="Electronics">Electronics</option>
                         <option value="Fashion">Fashion</option>
@@ -156,7 +157,7 @@
 
                 <div class="form-group">
                     <label for="productDescription">Description</label>
-                    <textarea id="productDescription" rows="3"></textarea>
+                    <textarea id="productDescription" name="description" rows="3"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -175,7 +176,9 @@
             </form>
         </div>
     </div>
+   
 
+    
     <!-- Toast Notification -->
     <div id="toast" class="toast">
         <i class="fas fa-check-circle"></i>
