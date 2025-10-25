@@ -69,7 +69,7 @@ try {
         $productsChange = (($currentMonthProducts - $lastMonthProducts) / $lastMonthProducts) * 100;
     }
 
-     $avgOrderQuery = "SELECT AVG(order_total) as avg_order FROM orders WHERE status = 'delivered'";
+    $avgOrderQuery = "SELECT AVG(order_total) as avg_order FROM orders WHERE status = 'delivered'";
     $avgOrderResult = $conn->query($avgOrderQuery);
     $avgOrderValue = $avgOrderResult->fetch_assoc()['avg_order'] ?? 0;
 

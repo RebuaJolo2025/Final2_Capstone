@@ -130,7 +130,7 @@ $result = $stmt->get_result();
         </td>
         <td><?= date('M d, Y h:i A', strtotime($row['order_date'])) ?></td>
         <td>
-            <?php if ($row['status'] !== 'Delivered' && $row['status'] !== 'Cancelled'): ?>
+            <?php if ($row['status'] !== 'Delivered' && $row['status'] !== 'Cancelled' && $row['status'] !== 'Shipped'): ?>
                 <!-- Cancel Button -->
                 <form method="POST" action="" style="margin-bottom:8px;" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                     <input type="hidden" name="order_id" value="<?= $row['id'] ?>">
