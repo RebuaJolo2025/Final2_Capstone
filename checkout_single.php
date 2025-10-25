@@ -5,14 +5,12 @@ if (!isset($_SESSION['email'])) {
     exit;
 }
 
-// Ensure buy_now session exists
-if (!isset($_SESSION['buy_now'])) {
+ if (!isset($_SESSION['buy_now'])) {
     echo "<p>No product selected for Buy Now. <a href='index.php'>Back to products</a></p>";
     exit;
 }
 
-// Get Buy Now item
-$item = $_SESSION['buy_now'];
+ $item = $_SESSION['buy_now'];
 $total = $item['price'] * $item['quantity'];
 ?>
 <!DOCTYPE html>
@@ -30,8 +28,7 @@ $total = $item['price'] * $item['quantity'];
         .back-link { display: block; margin-top: 15px; text-align: center; color: #2196F3; text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
         
-        /* Payment Section Styles */
-        .payment-section {
+         .payment-section {
             margin: 25px 0;
             padding: 20px;
             background: #f8f9fa;
@@ -127,12 +124,10 @@ $total = $item['price'] * $item['quantity'];
     <p class="total">Total: ₱<?= number_format($total, 2) ?></p>
 
     <form method="POST" action="place_order.php">
-        <!-- Send as if it were a cart of one -->
-        <input type="hidden" name="selected_items[]" value="<?= $item['id'] ?>">
+         <input type="hidden" name="selected_items[]" value="<?= $item['id'] ?>">
         <input type="hidden" name="quantities[<?= $item['id'] ?>]" value="<?= $item['quantity'] ?>">
         
-        <!-- Payment Method Selection -->
-        <div class="payment-section">
+         <div class="payment-section">
             <h3>Payment Method</h3>
             <div class="payment-options">
                 <select name="payment_method" id="payment_method" required>
@@ -141,15 +136,14 @@ $total = $item['price'] * $item['quantity'];
                 </select>
             </div>
             
-            <!-- Payment Instructions -->
-            <div class="payment-info" id="payment-info">
+             <div class="payment-info" id="payment-info">
                 <div class="info-content" id="cod-info" style="display: none;">
-                    <h4>💰 Cash on Delivery</h4>
+                    <h4>Cash on Delivery</h4>
                     <p>Pay when your order arrives at your doorstep. Please have the exact amount ready.</p>
                     <ul>
-                        <li>✅ No advance payment required</li>
-                        <li>✅ Pay in cash to the delivery rider</li>
-                        <li>✅ Inspect your items before payment</li>
+                        <li> No advance payment required</li>
+                        <li> Pay in cash to the delivery rider</li>
+                        <li>Inspect your items before payment</li>
                     </ul>
                 </div>
             </div>
@@ -167,37 +161,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const placeOrderBtn = document.getElementById('place-order-btn');
     const paymentInfo = document.getElementById('payment-info');
     
-    // Handle payment method change
-    paymentSelect.addEventListener('change', function() {
+     paymentSelect.addEventListener('change', function() {
         const selectedMethod = this.value;
         
-        // Hide all payment info sections
-        const allInfoSections = document.querySelectorAll('.info-content');
+         const allInfoSections = document.querySelectorAll('.info-content');
         allInfoSections.forEach(section => {
             section.style.display = 'none';
         });
         
-        // Show selected payment info
-        if (selectedMethod) {
+         if (selectedMethod) {
             const selectedInfo = document.getElementById(selectedMethod + '-info');
             if (selectedInfo) {
                 selectedInfo.style.display = 'block';
             }
             
-            // Enable place order button
-            placeOrderBtn.disabled = false;
+             placeOrderBtn.disabled = false;
             placeOrderBtn.textContent = 'Place Order';
             placeOrderBtn.style.background = '#2e7d32';
         } else {
-            // Disable place order button if no payment method selected
-            placeOrderBtn.disabled = true;
+             placeOrderBtn.disabled = true;
             placeOrderBtn.textContent = 'Select Payment Method';
             placeOrderBtn.style.background = '#ccc';
         }
     });
     
-    // Form validation before submit
-    document.querySelector('form').addEventListener('submit', function(e) {
+     document.querySelector('form').addEventListener('submit', function(e) {
         const selectedPayment = paymentSelect.value;
         
         if (!selectedPayment) {
@@ -207,7 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
-        // Confirmation dialog
         const confirmMessage = `Confirm your order with Cash on Delivery (COD)?\n\nTotal: ₱<?= number_format($total, 2) ?>`;
         
         if (!confirm(confirmMessage)) {

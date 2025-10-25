@@ -1,87 +1,74 @@
 <?php
-// Include database connection
+ 
 include '../conn.php';
 
-// Calculate revenue metrics from delivered orders
+ 
 $currentMonth = date('Y-m');
 $lastMonth = date('Y-m', strtotime('-1 month'));
 
 try {
-    // Total Revenue (all delivered orders)
+     
     $totalRevenueQuery = "SELECT SUM(order_total) as total_revenue FROM orders WHERE status = 'delivered'";
     $totalRevenueResult = $conn->query($totalRevenueQuery);
     $totalRevenue = $totalRevenueResult->fetch_assoc()['total_revenue'] ?? 0;
 
-    // Current Month Revenue
+     
     $currentMonthQuery = "SELECT SUM(order_total) as month_revenue FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$currentMonth'";
     $currentMonthResult = $conn->query($currentMonthQuery);
     $currentMonthRevenue = $currentMonthResult->fetch_assoc()['month_revenue'] ?? 0;
 
-    // Last Month Revenue
-    $lastMonthQuery = "SELECT SUM(order_total) as last_month_revenue FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$lastMonth'";
+     $lastMonthQuery = "SELECT SUM(order_total) as last_month_revenue FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$lastMonth'";
     $lastMonthResult = $conn->query($lastMonthQuery);
     $lastMonthRevenue = $lastMonthResult->fetch_assoc()['last_month_revenue'] ?? 0;
 
-    // Calculate percentage change
-    $revenueChange = 0;
+     $revenueChange = 0;
     if ($lastMonthRevenue > 0) {
         $revenueChange = (($currentMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100;
     }
 
-    // Total Orders (delivered)
-    $totalOrdersQuery = "SELECT COUNT(*) as total_orders FROM orders WHERE status = 'delivered'";
+     $totalOrdersQuery = "SELECT COUNT(*) as total_orders FROM orders WHERE status = 'delivered'";
     $totalOrdersResult = $conn->query($totalOrdersQuery);
     $totalOrders = $totalOrdersResult->fetch_assoc()['total_orders'] ?? 0;
 
-    // Current Month Orders
-    $currentMonthOrdersQuery = "SELECT COUNT(*) as month_orders FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$currentMonth'";
+     $currentMonthOrdersQuery = "SELECT COUNT(*) as month_orders FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$currentMonth'";
     $currentMonthOrdersResult = $conn->query($currentMonthOrdersQuery);
     $currentMonthOrders = $currentMonthOrdersResult->fetch_assoc()['month_orders'] ?? 0;
 
-    // Last Month Orders
-    $lastMonthOrdersQuery = "SELECT COUNT(*) as last_month_orders FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$lastMonth'";
+     $lastMonthOrdersQuery = "SELECT COUNT(*) as last_month_orders FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$lastMonth'";
     $lastMonthOrdersResult = $conn->query($lastMonthOrdersQuery);
     $lastMonthOrders = $lastMonthOrdersResult->fetch_assoc()['last_month_orders'] ?? 0;
 
-    // Calculate orders percentage change
-    $ordersChange = 0;
+     $ordersChange = 0;
     if ($lastMonthOrders > 0) {
         $ordersChange = (($currentMonthOrders - $lastMonthOrders) / $lastMonthOrders) * 100;
     }
 
-    // Active Customers (unique customers with delivered orders)
-    $activeCustomersQuery = "SELECT COUNT(DISTINCT email) as active_customers FROM orders WHERE status = 'delivered'";
+     $activeCustomersQuery = "SELECT COUNT(DISTINCT email) as active_customers FROM orders WHERE status = 'delivered'";
     $activeCustomersResult = $conn->query($activeCustomersQuery);
     $activeCustomers = $activeCustomersResult->fetch_assoc()['active_customers'] ?? 0;
 
-    // Products Sold (total quantity of delivered products)
-    $productsSoldQuery = "SELECT SUM(quantity) as products_sold FROM orders WHERE status = 'delivered'";
+     $productsSoldQuery = "SELECT SUM(quantity) as products_sold FROM orders WHERE status = 'delivered'";
     $productsSoldResult = $conn->query($productsSoldQuery);
     $productsSold = $productsSoldResult->fetch_assoc()['products_sold'] ?? 0;
 
-    // Current Month Products Sold
-    $currentMonthProductsQuery = "SELECT SUM(quantity) as month_products FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$currentMonth'";
+     $currentMonthProductsQuery = "SELECT SUM(quantity) as month_products FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$currentMonth'";
     $currentMonthProductsResult = $conn->query($currentMonthProductsQuery);
     $currentMonthProducts = $currentMonthProductsResult->fetch_assoc()['month_products'] ?? 0;
 
-    // Last Month Products Sold
-    $lastMonthProductsQuery = "SELECT SUM(quantity) as last_month_products FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$lastMonth'";
+     $lastMonthProductsQuery = "SELECT SUM(quantity) as last_month_products FROM orders WHERE status = 'delivered' AND DATE_FORMAT(order_date, '%Y-%m') = '$lastMonth'";
     $lastMonthProductsResult = $conn->query($lastMonthProductsQuery);
     $lastMonthProducts = $lastMonthProductsResult->fetch_assoc()['last_month_products'] ?? 0;
 
-    // Calculate products percentage change
-    $productsChange = 0;
+     $productsChange = 0;
     if ($lastMonthProducts > 0) {
         $productsChange = (($currentMonthProducts - $lastMonthProducts) / $lastMonthProducts) * 100;
     }
 
-    // Average Order Value
-    $avgOrderQuery = "SELECT AVG(order_total) as avg_order FROM orders WHERE status = 'delivered'";
+     $avgOrderQuery = "SELECT AVG(order_total) as avg_order FROM orders WHERE status = 'delivered'";
     $avgOrderResult = $conn->query($avgOrderQuery);
     $avgOrderValue = $avgOrderResult->fetch_assoc()['avg_order'] ?? 0;
 
-    // Top Selling Products
-    $topProductsQuery = "SELECT product_name, SUM(quantity) as total_sold, SUM(order_total) as total_revenue 
+     $topProductsQuery = "SELECT product_name, SUM(quantity) as total_sold, SUM(order_total) as total_revenue 
                         FROM orders WHERE status = 'delivered' 
                         GROUP BY product_name 
                         ORDER BY total_sold DESC 
@@ -94,8 +81,7 @@ try {
         }
     }
 
-    // Recent Transactions
-    $recentTransactionsQuery = "SELECT o.id, o.product_name, o.order_total, o.order_date, u.fullname as customer_name 
+     $recentTransactionsQuery = "SELECT o.id, o.product_name, o.order_total, o.order_date, u.fullname as customer_name 
                                FROM orders o 
                                LEFT JOIN (SELECT DISTINCT email, fullname FROM userdata) u ON o.email = u.email 
                                WHERE o.status = 'delivered' 
@@ -109,8 +95,7 @@ try {
         }
     }
 
-    // Monthly Revenue Data for Chart (last 6 months)
-    $monthlyRevenueData = [];
+     $monthlyRevenueData = [];
     for ($i = 5; $i >= 0; $i--) {
         $month = date('Y-m', strtotime("-$i months"));
         $monthName = date('M Y', strtotime("-$i months"));
@@ -126,8 +111,7 @@ try {
     }
 
 } catch (Exception $e) {
-    // Set default values if database error
-    $totalRevenue = 0;
+     $totalRevenue = 0;
     $revenueChange = 0;
     $totalOrders = 0;
     $ordersChange = 0;
@@ -141,13 +125,11 @@ try {
     $dbError = $e->getMessage();
 }
 
-// Helper function to format currency
-function formatCurrency($amount) {
+ function formatCurrency($amount) {
     return '₱' . number_format($amount, 2);
 }
 
-// Helper function to format percentage
-function formatPercentage($value) {
+ function formatPercentage($value) {
     $sign = $value >= 0 ? '+' : '';
     return $sign . number_format($value, 1) . '% from last month';
 }
@@ -161,20 +143,14 @@ function formatPercentage($value) {
     <meta name="description" content="Comprehensive admin dashboard for Ready-to-Wear fashion analytics, sales tracking, and business insights">
     <meta name="author" content="RTW Fashion">
     
-    <!-- Chart.js for analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Dashboard Layout -->
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <!-- Logo/Brand -->
-            <div class="sidebar-header">
+     <div class="dashboard-container">
+          <aside class="sidebar" id="sidebar">
+             <div class="sidebar-header">
                 <div class="brand">
                     <div class="brand-icon">
                         <i data-lucide="bar-chart-3"></i>
@@ -189,8 +165,7 @@ function formatPercentage($value) {
                 </button>
             </div>
 
-            <!-- Navigation -->
-            <nav class="sidebar-nav">
+             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <h3 class="nav-section-title">Analytics</h3>
                     <ul class="nav-list">
@@ -242,10 +217,8 @@ function formatPercentage($value) {
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="dashboard-header">
+         <main class="main-content">
+             <header class="dashboard-header">
                 <div class="header-left">
                     <button class="mobile-menu-toggle" id="mobileMenuToggle">
                         <i data-lucide="menu"></i>
@@ -257,10 +230,7 @@ function formatPercentage($value) {
                 </div>
                 
                 <div class="header-right">
-                    <button class="header-btn notification-btn">
-                        <i data-lucide="bell"></i>
-                        <span class="notification-badge"></span>
-                    </button>
+                   
                     
                     <div class="user-menu">
                         <button class="user-avatar" id="userMenuToggle">
@@ -282,10 +252,8 @@ function formatPercentage($value) {
                 </div>
             </header>
 
-            <!-- Page Content -->
-            <div class="page-content">
-                <!-- Dashboard Page -->
-                <div id="dashboard-page" class="page active">
+             <div class="page-content">
+                 <div id="dashboard-page" class="page active">
                     <div class="page-header">
                         <h1>Dashboard Overview</h1>
                         <p>Welcome back! Here's what's happening with your RTW store today.</p>
@@ -298,8 +266,7 @@ function formatPercentage($value) {
                         </div>
                     <?php endif; ?>
 
-                    <!-- Key Metrics -->
-                    <div class="metrics-grid">
+                     <div class="metrics-grid">
                         <div class="metric-card">
                             <div class="metric-header">
                                 <span class="metric-title">Total Revenue</span>
@@ -349,8 +316,7 @@ function formatPercentage($value) {
                         </div>
                     </div>
 
-                    <!-- Charts Section -->
-                    <div class="charts-grid">
+                     <div class="charts-grid">
                         <div class="chart-card">
                             <div class="chart-header">
                                 <h3>Revenue Trend</h3>
@@ -372,8 +338,7 @@ function formatPercentage($value) {
                         </div>
                     </div>
 
-                    <!-- Secondary Metrics -->
-                    <div class="metrics-grid">
+                     <div class="metrics-grid">
                         <div class="metric-card">
                             <div class="metric-header">
                                 <span class="metric-title">Average Order Value</span>
@@ -419,8 +384,7 @@ function formatPercentage($value) {
                         </div>
                     </div>
 
-                    <!-- Data Tables -->
-                    <div class="tables-grid">
+                     <div class="tables-grid">
                         <div class="table-card">
                             <div class="table-header">
                                 <h3>Top Selling Products</h3>
@@ -495,29 +459,23 @@ function formatPercentage($value) {
                     </div>
                 </div>
 
-                <!-- Add more pages as needed -->
-            </div>
+             </div>
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="script.js"></script>
+     <script src="script.js"></script>
     
     <script>
-        // Initialize charts with real data
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Lucide icons first
-            lucide.createIcons();
+         document.addEventListener('DOMContentLoaded', function() {
+             lucide.createIcons();
             
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart');
+             const revenueCtx = document.getElementById('revenueChart');
             if (revenueCtx) {
                 const monthlyData = <?= json_encode($monthlyRevenueData) ?>;
                 
                 console.log('Initializing Revenue Chart...');
                 
-                // Destroy existing chart if it exists
-                if (window.revenueChartInstance) {
+                 if (window.revenueChartInstance) {
                     window.revenueChartInstance.destroy();
                 }
                 
@@ -590,17 +548,14 @@ function formatPercentage($value) {
                 });
             }
             
-            // Category Chart (Sales by Product)
-            const categoryCtx = document.getElementById('categoryChart');
+             const categoryCtx = document.getElementById('categoryChart');
             if (categoryCtx) {
                 const topProducts = <?= json_encode($topProducts) ?>;
                 
-                // Prepare data for doughnut chart
-                const productNames = topProducts.map(product => product.product_name);
+                 const productNames = topProducts.map(product => product.product_name);
                 const productRevenues = topProducts.map(product => parseFloat(product.total_revenue));
                 
-                // Generate colors for each product
-                const colors = [
+                 const colors = [
                     'rgba(102, 126, 234, 0.8)',
                     'rgba(34, 197, 94, 0.8)',
                     'rgba(239, 68, 68, 0.8)',
@@ -618,8 +573,7 @@ function formatPercentage($value) {
                 
                 console.log('Initializing Category Chart...');
                 
-                // Destroy existing chart if it exists
-                if (window.categoryChartInstance) {
+                 if (window.categoryChartInstance) {
                     window.categoryChartInstance.destroy();
                 }
                 
@@ -676,10 +630,8 @@ function formatPercentage($value) {
     </script>
     
     <script>
-        // Additional dashboard functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate metric cards on load
-            const metricCards = document.querySelectorAll('.metric-card');
+         document.addEventListener('DOMContentLoaded', function() {
+             const metricCards = document.querySelectorAll('.metric-card');
             metricCards.forEach((card, index) => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
@@ -691,8 +643,7 @@ function formatPercentage($value) {
                 }, index * 100);
             });
             
-            // Add refresh functionality
-            const refreshBtn = document.createElement('button');
+             const refreshBtn = document.createElement('button');
             refreshBtn.className = 'header-btn';
             refreshBtn.innerHTML = '<i data-lucide="refresh-cw"></i>';
             refreshBtn.title = 'Refresh Dashboard';
@@ -707,8 +658,7 @@ function formatPercentage($value) {
                 lucide.createIcons();
             }
             
-            // Add real-time clock
-            function updateClock() {
+             function updateClock() {
                 const now = new Date();
                 const timeString = now.toLocaleTimeString('en-US', {
                     hour12: true,
@@ -747,8 +697,7 @@ function formatPercentage($value) {
     </script>
     
     <style>
-        /* Additional styles for tables */
-        .table-wrapper {
+         .table-wrapper {
             overflow-x: auto;
             border-radius: 8px;
             border: 1px solid #e5e7eb;

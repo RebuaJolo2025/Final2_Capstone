@@ -226,12 +226,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['selected_items'])) {
         <!-- Payment Instructions -->
         <div class="payment-info" id="payment-info">
             <div class="info-content" id="cod-info" style="display: none;">
-                <h4>💰 Cash on Delivery</h4>
+                <h4>Cash on Delivery</h4>
                 <p>Pay when your order arrives at your doorstep. Please have the exact amount ready.</p>
                 <ul>
-                    <li>✅ No advance payment required</li>
-                    <li>✅ Pay in cash to the delivery rider</li>
-                    <li>✅ Inspect your items before payment</li>
+                    <li> No advance payment required</li>
+                    <li> Pay in cash to the delivery rider</li>
+                    <li> Inspect your items before payment</li>
                 </ul>
             </div>
         

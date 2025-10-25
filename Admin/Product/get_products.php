@@ -1,8 +1,8 @@
 <?php
-// Ensure JSON response
+ 
 header('Content-Type: application/json');
 
-// Database connection
+ 
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -14,8 +14,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Fetch products
-$sql = "SELECT id, name, description, category, price, compare_price, stock, sku, weight, length, width, height, tags, images, status, created_at 
+ $sql = "SELECT id, name, description, category, price, compare_price, stock, sku, weight, length, width, height, tags, images, status, created_at 
         FROM products ORDER BY created_at DESC";
 
 $result = $conn->query($sql);
@@ -28,15 +27,12 @@ if ($result && $result->num_rows > 0) {
         $images = json_decode($row['images'], true) ?? [];
         $tags = json_decode($row['tags'], true) ?? [];
 
-        // Handle different image formats (direct paths or object with url)
-        $mainImage = 'uploads/placeholder.png'; // Default
+         $mainImage = 'uploads/placeholder.png'; 
         if (!empty($images)) {
             if (is_array($images[0])) {
-                // If images are objects with url property
-                $mainImage = $images[0]['url'] ?? 'uploads/placeholder.png';
+                 $mainImage = $images[0]['url'] ?? 'uploads/placeholder.png';
             } else {
-                // If images are direct file paths
-                $mainImage = $images[0];
+                 $mainImage = $images[0];
             }
         }
 

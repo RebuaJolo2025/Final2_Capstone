@@ -1,5 +1,5 @@
 <?php
-// Enable error reporting
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -7,18 +7,18 @@ header('Content-Type: application/json');
 ob_start();
 
 try {
-    // Include database connection
+   
     include '../conn.php';
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Get form data
+      
         $name = $_POST['name'] ?? '';
         $description = $_POST['description'] ?? '';
         $category = $_POST['category'] ?? '';
         $price = floatval($_POST['price'] ?? 0);
         $stock = intval($_POST['stock'] ?? 0);
         
-        // Basic validation
+         
         if (empty($name) || empty($category) || $price <= 0) {
             ob_clean();
             echo json_encode([
@@ -28,7 +28,7 @@ try {
             exit;
         }
         
-        // Handle image uploads
+       
         $uploadedFiles = [];
         $uploadDir = 'uploads/products/';
         if (!is_dir($uploadDir)) {
@@ -52,7 +52,7 @@ try {
 
         $imagesJson = json_encode($uploadedFiles);
         
-        // Create table if not exists
+  
         $createTable = "CREATE TABLE IF NOT EXISTS products (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
@@ -73,7 +73,7 @@ try {
             exit;
         }
         
-        // Insert product
+       
         $stmt = $conn->prepare("INSERT INTO products (name, description, category, price, stock, images) VALUES (?, ?, ?, ?, ?, ?)");
         
         if (!$stmt) {
