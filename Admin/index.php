@@ -1,5 +1,10 @@
 <?php
- 
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: login.php');
+    exit;
+}
+
 include '../conn.php';
 
  
@@ -174,16 +179,16 @@ try {
                         </a></li>
                         
                         <li>
-                            <a href="/Caps/Admin/Product/product.html" class="nav-link">
+                            <a href="Product/product.html" class="nav-link">
                                 <i data-lucide="package"></i><span>Products</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/Caps/Admin/payments.html" class="nav-link">
+                            <a href="payments.html" class="nav-link">
                                 <i data-lucide="credit-card"></i><span>Payments</span>
                             </a>
                         </li>
-                        <li><a href="/Caps/Admin/orders.php" class="nav-link">
+                        <li><a href="orders.php" class="nav-link">
                             <i data-lucide="shopping-bag"></i><span>Transactions</span>
                         </a></li>
                     </ul>
@@ -193,21 +198,21 @@ try {
                     <h3 class="nav-section-title">Management</h3>
                     <ul class="nav-list">
                         <li>
-                            <a href="/Caps/Admin/profiles.html" class="nav-link">
+                            <a href="profiles.php" class="nav-link">
                                 <i data-lucide="users"></i><span>Profile Reports</span>
                             </a>
                         </li> 
                         <li>
-                            <a href="/Caps/Admin/refunds.html" class="nav-link">
+                            <a href="refunds.html" class="nav-link">
                                 <i data-lucide="refresh-cw"></i>
                                 <span>Refunds</span>
                             </a>
                         </li>
-                        <li><a href="/Caps/Admin/delivery.html" class="nav-link">
+                        <li><a href="delivery.html" class="nav-link">
                             <i data-lucide="truck"></i><span>Delivery Status</span>
                         </a></li>
                         <li>
-                            <a href="/Caps/Admin/settings.html" class="nav-link">
+                            <a href="settings.html" class="nav-link">
                                 <i data-lucide="settings"></i>
                                 <span>Settings</span>
                             </a>
@@ -242,11 +247,11 @@ try {
                                 <p class="user-email">admin@rtw-fashion.com</p>
                             </div>
                             <div class="dropdown-divider"></div>
-                            <a href="#profile" class="dropdown-item">Profile</a>
-                            <a href="#settings" class="dropdown-item">Settings</a>
-                            <a href="#support" class="dropdown-item">Support</a>
+                            <a href="../edit-profile.php" class="dropdown-item">Profile</a>
+                            <a href="settings.html" class="dropdown-item">Settings</a>
+                            <a href="mailto:support@example.com" class="dropdown-item">Support</a>
                             <div class="dropdown-divider"></div>
-                            <a href="#logout" class="dropdown-item">Log out</a>
+                            <a href="../logout.php" class="dropdown-item">Log out</a>
                         </div>
                     </div>
                 </div>

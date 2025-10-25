@@ -1,0 +1,172 @@
+<?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+  header('Location: /Caps/Admin/login.php');
+  exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTW Analytics Hub - Profile Reports</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      background: #f9fafb;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(90deg, #4f46e5, #4338ca);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1.5rem; margin: 0; }
+    .back-btn {
+      background: white;
+      color: #4f46e5;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .back-btn:hover { background: #e0e7ff; }
+    .metrics {
+      display: flex;
+      justify-content: space-around;
+      background: white;
+      margin: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .metric { text-align: center; }
+    .metric h2 { margin: 0; font-size: 1.4rem; color: #4f46e5; }
+    .metric p { margin: 0; font-size: 0.9rem; color: #555; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1rem;
+      margin: 1rem;
+    }
+    .card { background: white; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .card h3 { font-size: 1rem; margin-bottom: 0.5rem; color: #444; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f3f4f6; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <h1>Profile Reports</h1>
+    <button class="back-btn" onclick="window.location.href='/Caps/Admin/index.html'">
+      ← Back to Dashboard
+    </button>
+  </header>
+
+  <!-- TOP METRICS -->
+  <div class="metrics">
+    <div class="metric">
+      <h2>892</h2>
+      <p>Total Customers</p>
+    </div>
+    <div class="metric">
+      <h2>56</h2>
+      <p>New This Month</p>
+    </div>
+    <div class="metric">
+      <h2>72%</h2>
+      <p>Returning Customers</p>
+    </div>
+    <div class="metric">
+      <h2>320</h2>
+      <p>Active Profiles</p>
+    </div>
+  </div>
+
+  <!-- CHARTS & ANALYTICS -->
+  <div class="grid">
+    <div class="card">
+      <h3>New Profiles by Month</h3>
+      <canvas id="profilesByMonth"></canvas>
+    </div>
+    <div class="card">
+      <h3>Profiles by Location</h3>
+      <canvas id="profilesByLocation"></canvas>
+    </div>
+    <div class="card">
+      <h3>Profiles by Gender</h3>
+      <canvas id="profilesByGender"></canvas>
+    </div>
+    <div class="card">
+      <h3>Top Customers</h3>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Orders</th><th>Total Spent</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Jane Doe</td><td>45</td><td>$4,560</td></tr>
+          <tr><td>Mark Smith</td><td>38</td><td>$3,980</td></tr>
+          <tr><td>Sara Lee</td><td>29</td><td>$3,120</td></tr>
+          <tr><td>John Carter</td><td>22</td><td>$2,450</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Profiles by Month
+    new Chart(document.getElementById("profilesByMonth"), {
+      type: "bar",
+      data: {
+        labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"],
+        datasets: [{
+          label: "New Profiles",
+          data: [56, 29, 57, 108, 47, 40, 29, 32, 34],
+          backgroundColor: "#4f46e5"
+        }]
+      },
+      options: { responsive: true }
+    });
+
+    // Profiles by Location
+    new Chart(document.getElementById("profilesByLocation"), {
+      type: "bar",
+      data: {
+        labels: ["New York", "Los Angeles", "Chicago", "Houston", "Miami"],
+        datasets: [{
+          label: "Customers",
+          data: [120, 95, 88, 72, 55],
+          backgroundColor: "#10b981"
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true
+      }
+    });
+
+    // Profiles by Gender
+    new Chart(document.getElementById("profilesByGender"), {
+      type: "doughnut",
+      data: {
+        labels: ["Male", "Female", "Other"],
+        datasets: [{
+          data: [480, 380, 32],
+          backgroundColor: ["#3b82f6", "#ec4899", "#f59e0b"]
+        }]
+      },
+      options: { plugins: { legend: { position: "bottom" } } }
+    });
+  </script>
+</body>
+</html>
