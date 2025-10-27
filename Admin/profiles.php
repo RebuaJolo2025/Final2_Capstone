@@ -4,6 +4,73 @@ if (!isset($_SESSION['email'])) {
   header('Location: /Caps/Admin/login.php');
   exit;
 }
+include '../conn.php';
+
+function formatCurrency($amount) {
+  return '₱' . number_format((float)$amount, 2);
+}
+
+// Metrics based on orders
+$currentMonth = date('Y-m');
+
+$totalCustomers = 0; $newThisMonth = 0; $returningCount = 0; $activeProfiles = 0;
+try {
+  $q1 = $conn->query("SELECT COUNT(DISTINCT email) c FROM orders WHERE status='delivered'");
+  $totalCustomers = (int)($q1->fetch_assoc()['c'] ?? 0);
+
+  $q2 = $conn->query("SELECT COUNT(DISTINCT email) c FROM orders WHERE status='delivered' AND DATE_FORMAT(order_date,'%Y-%m')='{$currentMonth}'");
+  $newThisMonth = (int)($q2->fetch_assoc()['c'] ?? 0);
+
+  $q3 = $conn->query("SELECT COUNT(*) c FROM (SELECT email, COUNT(*) n FROM orders WHERE status='delivered' GROUP BY email HAVING n>1) t");
+  $returningCount = (int)($q3->fetch_assoc()['c'] ?? 0);
+
+  $q4 = $conn->query("SELECT COUNT(DISTINCT email) c FROM orders WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)");
+  $activeProfiles = (int)($q4->fetch_assoc()['c'] ?? 0);
+} catch (Exception $e) {}
+
+$returningPct = $totalCustomers > 0 ? round(($returningCount / $totalCustomers) * 100) : 0;
+
+// Top Customers table
+$topCustomers = [];
+try {
+  $sqlTop = "SELECT COALESCE(u.fullname, o.email) AS name, COUNT(*) AS orders, SUM(o.order_total) AS total
+             FROM orders o
+             LEFT JOIN (SELECT DISTINCT email, fullname FROM userdata) u ON u.email=o.email
+             WHERE o.status='delivered'
+             GROUP BY o.email, name
+             ORDER BY total DESC
+             LIMIT 4";
+  if ($res = $conn->query($sqlTop)) {
+    while ($r = $res->fetch_assoc()) { $topCustomers[] = $r; }
+    $res->close();
+  }
+} catch (Exception $e) {}
+
+// Profiles by Month (distinct customers per month, last 9 months)
+$labelsMonths = []; $dataMonths = [];
+for ($i = 8; $i >= 0; $i--) {
+  $ym = date('Y-m', strtotime("-{$i} months"));
+  $labelsMonths[] = date('M', strtotime("-{$i} months"));
+  $cnt = 0;
+  $rs = $conn->query("SELECT COUNT(DISTINCT email) c FROM orders WHERE status='delivered' AND DATE_FORMAT(order_date,'%Y-%m')='{$ym}'");
+  if ($rs) { $cnt = (int)($rs->fetch_assoc()['c'] ?? 0); }
+  $dataMonths[] = $cnt;
+}
+
+// Profiles by Location (top 5 addresses)
+$labelsLoc = []; $dataLoc = [];
+try {
+  $sqlLoc = "SELECT COALESCE(NULLIF(TRIM(u.address),''),'Unknown') addr, COUNT(DISTINCT o.email) c
+             FROM orders o
+             LEFT JOIN userdata u ON u.email=o.email
+             GROUP BY addr
+             ORDER BY c DESC
+             LIMIT 5";
+  if ($res = $conn->query($sqlLoc)) {
+    while ($r = $res->fetch_assoc()) { $labelsLoc[] = $r['addr']; $dataLoc[] = (int)$r['c']; }
+    $res->close();
+  }
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +135,7 @@ if (!isset($_SESSION['email'])) {
   <!-- HEADER -->
   <header>
     <h1>Profile Reports</h1>
-    <button class="back-btn" onclick="window.location.href='/Caps/Admin/index.html'">
+    <button class="back-btn" onclick="window.location.href='/Caps/Admin/index.php'">
       ← Back to Dashboard
     </button>
   </header>
@@ -76,19 +143,19 @@ if (!isset($_SESSION['email'])) {
   <!-- TOP METRICS -->
   <div class="metrics">
     <div class="metric">
-      <h2>892</h2>
+      <h2><?= number_format($totalCustomers) ?></h2>
       <p>Total Customers</p>
     </div>
     <div class="metric">
-      <h2>56</h2>
+      <h2><?= number_format($newThisMonth) ?></h2>
       <p>New This Month</p>
     </div>
     <div class="metric">
-      <h2>72%</h2>
+      <h2><?= $returningPct ?>%</h2>
       <p>Returning Customers</p>
     </div>
     <div class="metric">
-      <h2>320</h2>
+      <h2><?= number_format($activeProfiles) ?></h2>
       <p>Active Profiles</p>
     </div>
   </div>
@@ -114,10 +181,17 @@ if (!isset($_SESSION['email'])) {
           <tr><th>Name</th><th>Orders</th><th>Total Spent</th></tr>
         </thead>
         <tbody>
-          <tr><td>Jane Doe</td><td>45</td><td>$4,560</td></tr>
-          <tr><td>Mark Smith</td><td>38</td><td>$3,980</td></tr>
-          <tr><td>Sara Lee</td><td>29</td><td>$3,120</td></tr>
-          <tr><td>John Carter</td><td>22</td><td>$2,450</td></tr>
+          <?php if (!empty($topCustomers)): ?>
+            <?php foreach ($topCustomers as $tc): ?>
+              <tr>
+                <td><?= htmlspecialchars($tc['name'] ?? 'Unknown') ?></td>
+                <td><?= (int)($tc['orders'] ?? 0) ?></td>
+                <td><?= formatCurrency($tc['total'] ?? 0) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr><td colspan="3" style="color:#9ca3af; text-align:center;">No data</td></tr>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>
@@ -128,10 +202,10 @@ if (!isset($_SESSION['email'])) {
     new Chart(document.getElementById("profilesByMonth"), {
       type: "bar",
       data: {
-        labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"],
+        labels: <?= json_encode($labelsMonths) ?>,
         datasets: [{
-          label: "New Profiles",
-          data: [56, 29, 57, 108, 47, 40, 29, 32, 34],
+          label: "Distinct Customers",
+          data: <?= json_encode($dataMonths) ?>,
           backgroundColor: "#4f46e5"
         }]
       },
@@ -142,10 +216,10 @@ if (!isset($_SESSION['email'])) {
     new Chart(document.getElementById("profilesByLocation"), {
       type: "bar",
       data: {
-        labels: ["New York", "Los Angeles", "Chicago", "Houston", "Miami"],
+        labels: <?= json_encode($labelsLoc) ?>,
         datasets: [{
           label: "Customers",
-          data: [120, 95, 88, 72, 55],
+          data: <?= json_encode($dataLoc) ?>,
           backgroundColor: "#10b981"
         }]
       },

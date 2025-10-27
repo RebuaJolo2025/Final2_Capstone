@@ -184,7 +184,7 @@ try {
                             </a>
                         </li>
                         <li>
-                            <a href="payments.html" class="nav-link">
+                            <a href="payments.php" class="nav-link">
                                 <i data-lucide="credit-card"></i><span>Payments</span>
                             </a>
                         </li>
@@ -203,12 +203,9 @@ try {
                             </a>
                         </li> 
                         <li>
-                            <a href="refunds.html" class="nav-link">
-                                <i data-lucide="refresh-cw"></i>
-                                <span>Refunds</span>
-                            </a>
+                        
                         </li>
-                        <li><a href="delivery.html" class="nav-link">
+                        <li><a href="delivery.php" class="nav-link">
                             <i data-lucide="truck"></i><span>Delivery Status</span>
                         </a></li>
                         <li>

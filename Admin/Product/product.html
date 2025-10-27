@@ -74,20 +74,24 @@
                 <div class="filter-controls">
                     <select id="categoryFilter">
                         <option value="all">All Categories</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Home & Living">Home & Living</option>
-                        <option value="Beauty & Health">Beauty & Health</option>
-                        <option value="Sports & Outdoors">Sports & Outdoors</option>
-                        <option value="Books & Media">Books & Media</option>
-                        <option value="Automotive">Automotive</option>
+                        <option value="Men’s Collection">Men’s Collection</option>
+                        <option value="Women’s Collection">Women’s Collection</option>
+                        <option value="Kids’ Wear">Kids’ Wear</option>
+                        <option value="Baby & Toddler">Baby & Toddler</option>
+                        <option value="Teens & Young Adults">Teens & Young Adults</option>
+                        <option value="Couple Outfits">Couple Outfits</option>
+                        <option value="Family Collection">Family Collection</option>
+                        <option value="Formal & Officewear">Formal & Officewear</option>
+                        <option value="Casual & Everyday Wear">Casual & Everyday Wear</option>
+                        <option value="Seasonal & Holiday Fashion">Seasonal & Holiday Fashion</option>
                     </select>
                     <select id="statusFilter">
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
-                 
+                    <button id="deleteSelectedBtn" class="btn btn-danger" style="margin-left:8px;">Delete Selected</button>
+                
                 </div>
             </div>
 
@@ -140,13 +144,16 @@
                     <label for="productCategory">Category *</label>
                     <select id="productCategory" name="category" required>
                         <option value="">Select a category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Home & Living">Home & Living</option>
-                        <option value="Beauty & Health">Beauty & Health</option>
-                        <option value="Sports & Outdoors">Sports & Outdoors</option>
-                        <option value="Books & Media">Books & Media</option>
-                        <option value="Automotive">Automotive</option>
+                        <option value="Men’s Collection">Men’s Collection</option>
+                        <option value="Women’s Collection">Women’s Collection</option>
+                        <option value="Kids’ Wear">Kids’ Wear</option>
+                        <option value="Baby & Toddler">Baby & Toddler</option>
+                        <option value="Teens & Young Adults">Teens & Young Adults</option>
+                        <option value="Couple Outfits">Couple Outfits</option>
+                        <option value="Family Collection">Family Collection</option>
+                        <option value="Formal & Officewear">Formal & Officewear</option>
+                        <option value="Casual & Everyday Wear">Casual & Everyday Wear</option>
+                        <option value="Seasonal & Holiday Fashion">Seasonal & Holiday Fashion</option>
                     </select>
                 </div>
 
@@ -181,5 +188,37 @@
     </div>
 
     <script src="product-script.js"></script>
-</body>
+    <script>
+      (function() {
+        const btn = document.getElementById('deleteSelectedBtn');
+        if (!btn) return;
+        btn.addEventListener('click', async function() {
+          const ids = Array.from(document.querySelectorAll('.row-select:checked'))
+            .map(cb => parseInt(cb.dataset.id, 10))
+            .filter(Number.isFinite);
+          if (ids.length === 0) {
+            alert('No products selected.');
+            return;
+          }
+          if (!confirm(`Delete ${ids.length} selected product(s)? This cannot be undone.`)) return;
+          try {
+            const res = await fetch('delete_product.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ids })
+            });
+            const out = await res.json();
+            if (out.success) {
+              alert(`Deleted ${out.deleted || ids.length} product(s).`);
+              location.reload();
+            } else {
+              alert(out.message || 'Failed to delete products.');
+            }
+          } catch (e) {
+            alert('Failed to delete products.');
+          }
+        });
+      })();
+    </script>
+  </body>
 </html>

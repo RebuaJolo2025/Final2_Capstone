@@ -85,6 +85,7 @@ $result = $stmt->get_result();
         .cancel-button:hover { background-color: #e67e22; }
         .status-info { margin: 10px 0 30px 0; background: #eef4ed; padding: 15px; border-radius: 10px; font-size: 14px; }
         .status-info ul { margin: 0; padding-left: 20px; }
+        .status-note { font-size: 12px; color: #555; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -111,13 +112,19 @@ $result = $stmt->get_result();
         <td><?= htmlspecialchars($row['quantity']) ?></td>
         <td>₱<?= number_format($row['order_total'], 2) ?></td>
         <td>
-            <?= htmlspecialchars($row['status']) ?>
+            <?php
+                $rawStatus = $row['status'];
+                $displayStatus = (in_array($rawStatus, ['Rejected', 'Out of Stock'])) ? 'Out of Stock' : $rawStatus;
+                echo htmlspecialchars($displayStatus);
+            ?>
             <div class="tracker">
                 <?php
                     $statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
-                    $currentStatus = $row['status'];
+                    $currentStatus = $displayStatus;
                     if ($currentStatus === 'Cancelled') {
                         echo '<div class="step cancelled">Cancelled</div>';
+                    } elseif ($currentStatus === 'Out of Stock') {
+                        echo '<div class="step">Out of Stock</div>';
                     } else {
                         foreach ($statuses as $step) {
                             $class = ($step === $currentStatus) ? 'step active' : 'step';
@@ -127,10 +134,13 @@ $result = $stmt->get_result();
                     }
                 ?>
             </div>
+            <?php if ($displayStatus === 'Out of Stock'): ?>
+                <div class="status-note">Your order is out of stock.</div>
+            <?php endif; ?>
         </td>
         <td><?= date('M d, Y h:i A', strtotime($row['order_date'])) ?></td>
         <td>
-            <?php if ($row['status'] !== 'Delivered' && $row['status'] !== 'Cancelled' && $row['status'] !== 'Shipped'): ?>
+            <?php if ($row['status'] !== 'Delivered' && $row['status'] !== 'Cancelled' && $row['status'] !== 'Shipped' && $row['status'] !== 'Rejected' && $row['status'] !== 'Out of Stock'): ?>
                 <!-- Cancel Button -->
                 <form method="POST" action="" style="margin-bottom:8px;" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                     <input type="hidden" name="order_id" value="<?= $row['id'] ?>">

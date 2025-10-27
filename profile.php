@@ -42,10 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_pic']) && $_
     }
 }
 
-$query = "SELECT * FROM userdata WHERE email='$email'";
+$query = "SELECT * FROM userdata WHERE email='" . mysqli_real_escape_string($conn, $email) . "'";
 $result = mysqli_query($conn, $query);
-$user = mysqli_fetch_assoc($result);
-$profilePic = !empty($user['profile_pic']) ? $user['profile_pic'] : './img/default-avatar.png';
+$user = ($result && mysqli_num_rows($result) > 0) ? mysqli_fetch_assoc($result) : null;
+if (!$user) {
+    $user = [
+        'fullname' => 'Unknown User',
+        'email' => $email,
+        'phonenumber' => '',
+        'address' => '',
+        'profile_pic' => ''
+    ];
+}
+$profilePic = !empty($user['profile_pic']) ? $user['profile_pic'] : 'img/icon.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">

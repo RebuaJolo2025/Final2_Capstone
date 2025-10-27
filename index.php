@@ -1,3 +1,10 @@
+<?php
+ session_start();
+ if (!isset($_SESSION['email'])) {
+   header("Location: login.php");
+   exit();
+ }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -294,12 +301,21 @@
       var input = document.getElementById("searchBar").value.toLowerCase();
       var categorySelect = document.getElementById("categoryFilter");
       var selectedCategory = categorySelect ? (categorySelect.value || "").toLowerCase() : "";
+      function normalizeCategory(str) {
+        return (str || "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+      }
+      var normSelected = normalizeCategory(selectedCategory);
       var productItems = document.getElementsByClassName("product-item");
       for (var i = 0; i < productItems.length; i++) {
         var productName = productItems[i].getElementsByTagName("h3")[0].innerText.toLowerCase();
-        var productCategory = (productItems[i].getAttribute("data-category") || "").toLowerCase();
+        var productCategoryRaw = (productItems[i].getAttribute("data-category") || "");
+        var normCategory = normalizeCategory(productCategoryRaw);
         var matchesText = productName.includes(input);
-        var matchesCategory = !selectedCategory || productCategory === selectedCategory;
+        var matchesCategory = !normSelected;
+        if (!matchesCategory) {
+          var tokens = normCategory.split("_");
+          matchesCategory = tokens.includes(normSelected) || normCategory.startsWith(normSelected + "_") || normCategory === normSelected;
+        }
         productItems[i].style.display = (matchesText && matchesCategory) ? "" : "none";
       }
     }

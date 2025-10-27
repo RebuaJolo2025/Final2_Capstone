@@ -6,6 +6,7 @@ const statusFilter = document.getElementById('statusFilter');
 const clearFiltersBtn = document.getElementById('clearFilters');
 const productCount = document.getElementById('productCount');
 const emptyState = document.getElementById('emptyState');
+const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 
 // Modal elements
 const addProductModal = document.getElementById('addProductModal');
@@ -34,6 +35,7 @@ const totalSoldEl = document.getElementById('totalSold');
 let products = [];
 let isEditing = false;
 let currentFilters = { search: '', category: 'all', status: 'all' };
+const selectedIds = new Set();
 
 // Fetch products from database
 async function fetchProducts() {
@@ -41,6 +43,7 @@ async function fetchProducts() {
         const response = await fetch('get_products.php');
         if (!response.ok) throw new Error('Network response was not ok');
         products = await response.json();
+        selectedIds.clear();
         renderProducts();
         updateStats();
     } catch (error) {
@@ -67,6 +70,13 @@ function setupEventListeners() {
     categoryFilter.addEventListener('change', handleCategoryFilter);
     statusFilter.addEventListener('change', handleStatusFilter);
     clearFiltersBtn.addEventListener('click', clearFilters);
+    if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', async () => {
+            if (selectedIds.size === 0) { showToast('No products selected', 'error'); return; }
+            if (!confirm(`Delete ${selectedIds.size} selected product(s)? This cannot be undone.`)) return;
+            await bulkDelete(Array.from(selectedIds));
+        });
+    }
 
     addProductBtn.addEventListener('click', (e) => { e.preventDefault(); startAdd(); });
     closeModalBtn.addEventListener('click', closeModal);
@@ -77,13 +87,7 @@ function setupEventListeners() {
         if (e.target === addProductModal) closeModal();
     });
 
-    document.addEventListener('click', (e) => {
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            if (!menu.closest('.action-menu').contains(e.target)) {
-                menu.classList.remove('show');
-            }
-        });
-    });
+    // removed dropdown menu handlers
 }
 
 // Handle search and filters
@@ -126,25 +130,13 @@ function renderProducts() {
                     <div class="image-placeholder" style="display:none; width:100%; height:200px; background:#f3f4f6; align-items:center; justify-content:center; color:#9ca3af; font-size:14px;">
                         📷 No Image
                     </div>
-                    <div class="product-actions">
-                        <div class="action-menu">
-                            <button class="action-btn" onclick="toggleDropdown(${product.id})">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <div class="dropdown-menu" id="dropdown-${product.id}">
-                                <button class="dropdown-item" onclick="editProduct(${product.id})">
-                                    <i class="fas fa-edit"></i> Edit Product
-                                </button>
-                                <button class="dropdown-item" onclick="viewProduct(${product.id})">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
-                        <h3 class="product-title">${product.name}</h3>
+                        <label style="display:flex; align-items:center; gap:8px;">
+                          <input type="checkbox" class="row-select" data-id="${product.id}" ${selectedIds.has(product.id) ? 'checked' : ''}>
+                          <h3 class="product-title" style="margin:0;">${product.name}</h3>
+                        </label>
                         <span class="product-category">${product.category}</span>
                     </div>
                     <div class="product-details">
@@ -164,17 +156,20 @@ function renderProducts() {
                 </div>
             </div>
         `).join('');
+
+        // attach checkbox listeners
+        document.querySelectorAll('.row-select').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                const id = parseInt(e.target.getAttribute('data-id'));
+                if (e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
+            });
+        });
     }
 
     productCount.textContent = `Showing ${filtered.length} of ${products.length} products`;
 }
 
-// Dropdown & actions
-function toggleDropdown(id) {
-    const dropdown = document.getElementById(`dropdown-${id}`);
-    document.querySelectorAll('.dropdown-menu').forEach(menu => { if (menu !== dropdown) menu.classList.remove('show'); });
-    dropdown.classList.toggle('show');
-}
+// Dropdown removed
 function editProduct(id) {
     const p = products.find(prod => prod.id === id);
     if (!p) return;
