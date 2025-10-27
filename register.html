@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register - InfluenceX</title>
+  <title id="pageTitle">Register - InfluenceX</title>
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -53,8 +53,6 @@
       font-size: 1.2rem;
     }
 
-
-
     .form-group {
       margin-bottom: 18px;
       text-align: left;
@@ -84,12 +82,6 @@
       border: 2px solid #4caf50;
       background: #fff;
       box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-    }
-
-    /* Style date input for consistency */
-    input[type="date"] {
-      color: #333;
-      font-size: 1em;
     }
 
     input[type="date"]::-webkit-calendar-picker-indicator {
@@ -146,8 +138,10 @@
 <body>
   <div class="register-container">
     <div class="logo"><i class="fa-solid fa-user-plus"></i></div>
-    <h1>Create Account</h1>
+    <h1 id="roleTitle">Customer Registration</h1>
     <form action="process.php" method="post">
+      <!-- This will be auto-filled based on the URL -->
+      <input type="hidden" name="role" id="role" value="customer">
       <div class="form-group">
         <label for="fullName">Full Name</label>
         <input type="text" id="fullName" name="fullName" required />
@@ -164,27 +158,38 @@
         <label for="phone">Phone Number</label>
         <input type="tel" id="phone" name="phone" required />
       </div>
-      <!-- Stylish Birth Date field -->
       <div class="form-group">
         <label for="birthdate">Birth Date</label>
         <input type="date" id="birthdate" name="birthdate" required />
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          minlength="6"
-          required
-        />
+        <input type="password" id="password" name="password" minlength="6" required />
       </div>
       <button type="submit" name="submit" class="btn">Register</button>
 
       <div class="sign-in-btn">
-        <p>Already have an account? <a href="login.php">Sign In</a></p>
+        <p>Already have an account? <a id="loginLink" href="login.php">Sign In</a></p>
       </div>
     </form>
   </div>
+
+  <!-- ✅ AUTO DETECT ROLE SCRIPT -->
+  <script>
+    const url = window.location.href;
+    const roleInput = document.getElementById("role");
+    const title = document.getElementById("roleTitle");
+    const loginLink = document.getElementById("loginLink");
+
+    if (url.includes("/Admin/")) {
+      roleInput.value = "admin";
+      title.textContent = "Admin Registration";
+      loginLink.href = "login.php"; // for Admin folder
+    } else {
+      roleInput.value = "customer";
+      title.textContent = "Customer Registration";
+      loginLink.href = "login.php"; // for root folder
+    }
+  </script>
 </body>
 </html>
