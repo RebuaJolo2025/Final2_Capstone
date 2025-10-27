@@ -352,16 +352,12 @@
       <label for="categoryFilter">Category:</label>
       <select id="categoryFilter" class="category-select" onchange="searchProducts()">
         <option value="">All Categories</option>
-        <option value="men">Men’s Collection</option>
-        <option value="women">Women’s Collection</option>
-        <option value="kids">Kids’ Wear</option>
-        <option value="baby_toddler">Baby & Toddler</option>
-        <option value="teens">Teens & Young Adults</option>
-        <option value="couple">Couple Outfits</option>
-        <option value="family">Family Collection</option>
-        <option value="formal">Formal & Officewear</option>
-        <option value="casual">Casual & Everyday Wear</option>
-        <option value="seasonal">Seasonal & Holiday Fashion</option>
+        <option value="Tops & Knitwear">Tops & Knitwear</option>
+        <option value="Dresses & Jumpsuits / Rompers">Dresses & Jumpsuits / Rompers</option>
+        <option value="Bottoms (Pants, Shorts, Skirts, Leggings)">Bottoms (Pants, Shorts, Skirts, Leggings)</option>
+        <option value="Outerwear (Jackets, Coats, Cardigans, Hoodies)">Outerwear (Jackets, Coats, Cardigans, Hoodies)</option>
+        <option value="Sleepwear & Sets">Sleepwear & Sets</option>
+        <option value="Casual & Korean Fashion">Casual & Korean Fashion</option>
       </select>
     </div>
 

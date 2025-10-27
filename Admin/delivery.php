@@ -125,18 +125,25 @@ if ($res = $conn->query($sql)) {
   <!-- Charts + Table -->
   <div class="grid">
     <div>
-      <div class="chart-card card">
-        <strong>Deliveries by Status</strong>
-        <div class="small-muted" style="margin-bottom:0.6rem">Overview of all active deliveries</div>
-        <canvas id="statusChart" height="240"></canvas>
-      </div>
+      <style>
+  #statusChart { width: 100% !important; height: 300px !important; }
+  #monthlyChart { width: 100% !important; height: 220px !important; }
+  .chart-card { max-width: 100%; }
+</style>
 
-      <div style="height:16px"></div>
+<div class="chart-card card">
+  <strong>Deliveries by Status</strong>
+  <div class="small-muted" style="margin-bottom:0.6rem">Overview of all active deliveries</div>
+  <canvas id="statusChart"></canvas>
+</div>
+
+
+      <div style="height: 10px;"></div>
 
       <div class="chart-card card">
         <strong>Monthly Deliveries</strong>
         <div class="small-muted" style="margin-bottom:0.6rem">Completed deliveries by month</div>
-        <canvas id="monthlyChart" height="160"></canvas>
+        <canvas id="monthlyChart"></canvas>
       </div>
     </div>
 
@@ -189,13 +196,22 @@ function createCharts(){
   statusChart = new Chart(document.getElementById('statusChart').getContext('2d'),{
     type:'doughnut',
     data:{labels:['Pending','Shipped','Delivered','Failed'],datasets:[{data:[statusCounts.pending,statusCounts.shipped,statusCounts.delivered,statusCounts.failed],backgroundColor:['#facc15','#38bdf8','#22c55e','#ef4444']}]},
-    options:{plugins:{legend:{position:'bottom'}}}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      cutout:'60%',
+      plugins:{legend:{position:'bottom'}}
+    }
   });
 
   monthlyChart = new Chart(document.getElementById('monthlyChart').getContext('2d'),{
     type:'bar',
     data:{labels:monthLabels,datasets:[{label:'Deliveries',data:monthDelivered,backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--accent')}]},
-    options:{scales:{y:{beginAtZero:true}}}
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      scales:{y:{beginAtZero:true}}
+    }
   });
 }
 
