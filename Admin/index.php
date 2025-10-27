@@ -248,7 +248,7 @@ try {
                             <a href="settings.html" class="dropdown-item">Settings</a>
                             <a href="mailto:support@example.com" class="dropdown-item">Support</a>
                             <div class="dropdown-divider"></div>
-                            <a href="../logout.php" class="dropdown-item">Log out</a>
+                            <a href="logout.php" class="dropdown-item">Log out</a>
                         </div>
                     </div>
                 </div>
@@ -263,7 +263,7 @@ try {
 
                     <?php if (isset($dbError)): ?>
                         <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin: 1rem 0; text-align: center; border: 1px solid #fecaca;">
-                            <strong>⚠️ Database Error:</strong> <?= htmlspecialchars($dbError) ?>
+                            <strong>Database Error:</strong> <?= htmlspecialchars($dbError) ?>
                             <br><small>Showing default values. Please check your database connection.</small>
                         </div>
                     <?php endif; ?>
