@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - InfluenceX</title>
+  <title>Admin Login - InfluenceX</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -64,23 +64,18 @@
     .signup-link a {color:#FFD700;font-weight:bold;text-decoration:none;}
     .signup-link a:hover {text-decoration:underline;}
 
-    .error-message,.success-message {
-      font-size:0.85em;margin-bottom:15px;padding:8px;border-radius:6px;
-    }
-    .error-message {color:#b71c1c;background:rgba(244,67,54,0.1);border:1px solid #f44336;}
-    .success-message {color:#1b5e20;background:rgba(76,175,80,0.1);border:1px solid #4CAF50;}
   </style>
 </head>
 <body>
   <div class="login-container">
-    <div class="logo"><i class="fa-solid fa-user-circle"></i></div>
-    <h2>Welcome Back</h2>
+    <div class="logo"><i class="fa-solid fa-user-shield"></i></div>
+    <h2>Admin Login</h2>
 
     <form action="seller_process.php" method="POST">
 
       <div class="input-group">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required placeholder="Enter your email" />
+        <input type="email" id="email" name="email" required placeholder="Enter admin email" />
         <i class="fa-solid fa-envelope"></i>
       </div>
 
@@ -95,7 +90,7 @@
     </form>
 
     <div class="signup-link">
-      <p>Don't have an account? <a href="register.html">Sign up here</a></p>
+      <p>Don’t have an admin account? <a href="register.html">Register here</a></p>
     </div>
   </div>
 
