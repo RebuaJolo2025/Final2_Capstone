@@ -62,11 +62,9 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main">
+     <main class="main">
         <div class="container">
-            <!-- Filters -->
-            <div class="filters">
+             <div class="filters">
                 <div class="search-container">
                     <i class="fas fa-search"></i>
                     <input type="text" id="searchInput" placeholder="Search products...">
@@ -74,16 +72,12 @@
                 <div class="filter-controls">
                     <select id="categoryFilter">
                         <option value="all">All Categories</option>
-                        <option value="Men’s Collection">Men’s Collection</option>
-                        <option value="Women’s Collection">Women’s Collection</option>
-                        <option value="Kids’ Wear">Kids’ Wear</option>
-                        <option value="Baby & Toddler">Baby & Toddler</option>
-                        <option value="Teens & Young Adults">Teens & Young Adults</option>
-                        <option value="Couple Outfits">Couple Outfits</option>
-                        <option value="Family Collection">Family Collection</option>
-                        <option value="Formal & Officewear">Formal & Officewear</option>
-                        <option value="Casual & Everyday Wear">Casual & Everyday Wear</option>
-                        <option value="Seasonal & Holiday Fashion">Seasonal & Holiday Fashion</option>
+                        <option value="Tops & Knitwear">Tops & Knitwear</option>
+                        <option value="Dresses & Jumpsuits / Rompers">Dresses & Jumpsuits / Rompers</option>
+                        <option value="Bottoms (Pants, Shorts, Skirts, Leggings)">Bottoms (Pants, Shorts, Skirts, Leggings)</option>
+                        <option value="Outerwear (Jackets, Coats, Cardigans, Hoodies)">Outerwear (Jackets, Coats, Cardigans, Hoodies)</option>
+                        <option value="Sleepwear & Sets">Sleepwear & Sets</option>
+                        <option value="Casual & Korean Fashion">Casual & Korean Fashion</option>
                     </select>
                     <select id="statusFilter">
                         <option value="all">All Status</option>
@@ -99,13 +93,10 @@
                 <span id="productCount">Showing 6 of 6 products</span>
             </div>
 
-            <!-- Products Grid -->
-            <div id="productsGrid" class="products-grid">
-                <!-- Products will be rendered here -->
-            </div>
+             <div id="productsGrid" class="products-grid">
+             </div>
 
-            <!-- Empty State -->
-            <div id="emptyState" class="empty-state" style="display: none;">
+             <div id="emptyState" class="empty-state" style="display: none;">
                 <i class="fas fa-box"></i>
                 <h3>No products found</h3>
                 <p>Try adjusting your filters or search terms</p>
@@ -113,8 +104,7 @@
         </div>
     </main>
 
-    <!-- Add Product Modal -->
-    <div id="addProductModal" class="modal">
+     <div id="addProductModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Product</h2>
@@ -144,16 +134,12 @@
                     <label for="productCategory">Category *</label>
                     <select id="productCategory" name="category" required>
                         <option value="">Select a category</option>
-                        <option value="Men’s Collection">Men’s Collection</option>
-                        <option value="Women’s Collection">Women’s Collection</option>
-                        <option value="Kids’ Wear">Kids’ Wear</option>
-                        <option value="Baby & Toddler">Baby & Toddler</option>
-                        <option value="Teens & Young Adults">Teens & Young Adults</option>
-                        <option value="Couple Outfits">Couple Outfits</option>
-                        <option value="Family Collection">Family Collection</option>
-                        <option value="Formal & Officewear">Formal & Officewear</option>
-                        <option value="Casual & Everyday Wear">Casual & Everyday Wear</option>
-                        <option value="Seasonal & Holiday Fashion">Seasonal & Holiday Fashion</option>
+                        <option value="Tops & Knitwear">Tops & Knitwear</option>
+                        <option value="Dresses & Jumpsuits / Rompers">Dresses & Jumpsuits / Rompers</option>
+                        <option value="Bottoms (Pants, Shorts, Skirts, Leggings)">Bottoms (Pants, Shorts, Skirts, Leggings)</option>
+                        <option value="Outerwear (Jackets, Coats, Cardigans, Hoodies)">Outerwear (Jackets, Coats, Cardigans, Hoodies)</option>
+                        <option value="Sleepwear & Sets">Sleepwear & Sets</option>
+                        <option value="Casual & Korean Fashion">Casual & Korean Fashion</option>
                     </select>
                 </div>
 
@@ -181,8 +167,7 @@
    
 
     
-    <!-- Toast Notification --> 
-    <div id="toast" class="toast">
+     <div id="toast" class="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toastMessage">Product added successfully!</span>
     </div>
