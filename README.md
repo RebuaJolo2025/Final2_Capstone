@@ -45,6 +45,13 @@ This project may use the following technologies:
 - **Server:** XAMPP / InfinityFree
 - **Version Control:** Git & GitHub
 
+- Admin Info
+- Username: admin@gmail.com
+- Password: Admin123456
+
+- Customer Info
+- Username: marksmith@gmail.com
+- Password: 987654smith
 
 ---
 
@@ -54,3 +61,4 @@ This project may use the following technologies:
 
 ```bash
 git clone https://github.com/yourusername/luvbyten-ecommerce.git
+
